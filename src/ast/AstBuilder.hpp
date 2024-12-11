@@ -18,14 +18,25 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Builder of AST.
  */
-
 #pragma once
-#include <utils/ArgsParser.hpp>
+#include <utils/Path.hpp>
+#include <ast/Node.hpp>
 
-class Main {
+class AstBuilder {
 public:
-    static void main(int argc, char** argv);
-    static void processFile(Path &file);
+    Path path;
+    string src;
+    vector<shared_ptr<Node>> nodes;
+    int currChar = 0;
+    int currLine = 0, currPos = 0;
+
+    AstBuilder();
+    AstBuilder(Path &filePath);
+
+    void buildNodes();
+    vector<shared_ptr<Node>> buildNodesList();
+
+    void incCurrChar();
 };

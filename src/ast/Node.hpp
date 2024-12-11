@@ -18,14 +18,15 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Node (tag) of code.
  */
-
 #pragma once
-#include <utils/ArgsParser.hpp>
+#include <Defs.hpp>
 
-class Main {
+class Node {
 public:
-    static void main(int argc, char** argv);
-    static void processFile(Path &file);
+    string name;
+    string text;
+    vector<shared_ptr<Node>> nodes;
+    Node(string _name, vector<shared_ptr<Node>> _nodes, string _text);
 };

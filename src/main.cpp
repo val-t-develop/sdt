@@ -21,9 +21,23 @@
  *  Main project file.
  */
 #include <main.hpp>
+#include <utils/Out.hpp>
+#include <ast/AstBuilder.hpp>
 
 int main(int argc, char **argv) { Main::main(argc, argv); return 0; }
 
-void Main::main(int argc, char** argv) {
+void Main::main(int argc, char **argv) {
     ArgsParser::parseArgs(argc, argv);
+    for (Path file : ArgsParser::src) {
+        if (file.isFile()) {
+            processFile(file);
+        } else if (file.isDir()) {
+            Out::errorMessage("Processing directories is unsupported");
+        }
+    }
+}
+
+void Main::processFile(Path &file) {
+    AstBuilder ast_builder = AstBuilder(file);
+    ast_builder.buildNodes();
 }

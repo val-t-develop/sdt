@@ -29,6 +29,8 @@ src_files = ['src/main.hpp', 'src/main.cpp',
              'src/Defs.hpp', 'src/Defs.cpp', 'src/utils/License.hpp',
              'src/utils/Out.hpp', 'src/utils/Out.cpp',
              'src/utils/Path.hpp', 'src/utils/Path.cpp',
-             'src/utils/ArgsParser.hpp', 'src/utils/ArgsParser.cpp',]
+             'src/utils/ArgsParser.hpp', 'src/utils/ArgsParser.cpp',
+             'src/ast/Node.hpp', 'src/ast/Node.cpp',
+             'src/ast/AstBuilder.hpp', 'src/ast/AstBuilder.cpp',]
 
 executable('sdt', src_files, dependencies : podofo_dep, include_directories : incdir)
