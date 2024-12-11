@@ -18,12 +18,16 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Output utility.
  */
-#include <main.hpp>
 
-int main(int argc, char **argv) { Main::main(argc, argv); return 0; }
+#pragma once
+#include <Defs.hpp>
 
-void Main::main(int argc, char** argv) {
-    ArgsParser::parseArgs(argc, argv);
-}
+class Out {
+public:
+    static int messages;
+
+    static void errorMessage(string msg);
+    static void printMessage(string msg);
+};

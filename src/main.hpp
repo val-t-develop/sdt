@@ -20,10 +20,11 @@
  *
  *  Main project file.
  */
-#include <main.hpp>
 
-int main(int argc, char **argv) { Main::main(argc, argv); return 0; }
+#pragma once
+#include <utils/ArgsParser.hpp>
 
-void Main::main(int argc, char** argv) {
-    ArgsParser::parseArgs(argc, argv);
-}
+class Main {
+public:
+    static void main(int argc, char** argv);
+};

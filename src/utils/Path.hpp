@@ -18,12 +18,30 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Filesystem helper file.
  */
-#include <main.hpp>
 
-int main(int argc, char **argv) { Main::main(argc, argv); return 0; }
+#pragma once
+#include <Defs.hpp>
 
-void Main::main(int argc, char** argv) {
-    ArgsParser::parseArgs(argc, argv);
-}
+class Path {
+  fs::path path;
+  string content;
+
+public:
+  Path();
+  Path(string name);
+  Path(fs::path &path);
+
+  string getName() const;
+  string getFilename();
+  string readFile();
+  bool isFile();
+  bool isDir();
+  vector<Path> getDirContent();
+  Path getParent();
+  static Path getCurrentDir();
+  bool operator<(const Path &) const;
+  bool operator>(const Path &) const;
+  bool operator==(const Path &) const;
+};

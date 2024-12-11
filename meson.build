@@ -25,6 +25,10 @@ add_project_arguments('-W', '-Wall', '-Wextra', '-Wpedantic', '-g', language : '
 podofo_dep = dependency('libpodofo', version : '>=0.10.3')
 
 incdir = include_directories('src')
-src_files = ['src/main.cpp']
+src_files = ['src/main.hpp', 'src/main.cpp',
+             'src/Defs.hpp', 'src/Defs.cpp', 'src/utils/License.hpp',
+             'src/utils/Out.hpp', 'src/utils/Out.cpp',
+             'src/utils/Path.hpp', 'src/utils/Path.cpp',
+             'src/utils/ArgsParser.hpp', 'src/utils/ArgsParser.cpp',]
 
 executable('sdt', src_files, dependencies : podofo_dep, include_directories : incdir)

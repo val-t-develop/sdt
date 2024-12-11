@@ -1,5 +1,5 @@
 /*  SDT - Scientific Document Tool
- *  Copyright (C) 2022-2024  Valentyn Tymchyshyn
+*  Copyright (C) 2022-2024  Valentyn Tymchyshyn
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,12 +18,18 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Parser of arguments.
  */
-#include <main.hpp>
 
-int main(int argc, char **argv) { Main::main(argc, argv); return 0; }
+#pragma once
+#include <Defs.hpp>
+#include <utils/Path.hpp>
 
-void Main::main(int argc, char** argv) {
-    ArgsParser::parseArgs(argc, argv);
-}
+class ArgsParser {
+public:
+    static shared_ptr<Path> output;
+    static vector<Path> src;
+
+    static void parseArgs(int argc, char** argv);
+    static void parseArgs(vector<string> args);
+};

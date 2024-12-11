@@ -18,12 +18,21 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Output utility.
  */
-#include <main.hpp>
 
-int main(int argc, char **argv) { Main::main(argc, argv); return 0; }
+#include "Out.hpp"
 
-void Main::main(int argc, char** argv) {
-    ArgsParser::parseArgs(argc, argv);
+int Out::messages = 0;
+
+void Out::errorMessage(string msg) {
+    if (messages <= 50) {
+        cerr << msg << "\n";
+        messages++;
+    } else {
+        cerr << "Too many errors! Exit!\n";
+        exit(-1);
+    }
 }
+
+void Out::printMessage(string msg) { cout << msg << "\n"; }
