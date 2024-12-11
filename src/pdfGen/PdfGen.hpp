@@ -18,29 +18,15 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Generator of pdf.
  */
-#include <ast/AstBuilder.hpp>
-#include <main.hpp>
-#include <pdfGen/PdfGen.hpp>
-#include <utils/Out.hpp>
+#pragma once
+#include <Defs.hpp>
+#include <ast/Node.hpp>
+class PdfGen {
+public:
+    vector<shared_ptr<Node>> nodes;
+    PdfGen(vector<shared_ptr<Node>> _nodes);
+    void genPdf();
 
-int main(int argc, char **argv) { Main::main(argc, argv); return 0; }
-
-void Main::main(int argc, char **argv) {
-    ArgsParser::parseArgs(argc, argv);
-    for (Path file : ArgsParser::src) {
-        if (file.isFile()) {
-            processFile(file);
-        } else if (file.isDir()) {
-            Out::errorMessage("Processing directories is unsupported");
-        }
-    }
-}
-
-void Main::processFile(Path &file) {
-    AstBuilder ast_builder(file);
-    ast_builder.buildNodes();
-    PdfGen pdf_gen(ast_builder.nodes);
-    pdf_gen.genPdf();
-}
+};
