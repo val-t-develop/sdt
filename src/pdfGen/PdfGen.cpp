@@ -21,55 +21,92 @@
  *  Generator of pdf.
  */
 #include "PdfGen.hpp"
-#include <podofo/podofo.h>
 #include <utils/ArgsParser.hpp>
-using namespace PoDoFo;
+#include <utils/Out.hpp>
+
+vector<PdfFont*> PdfGen::fonts;
+PdfMemDocument* PdfGen::document;
+PdfPainter* PdfGen::painter;
+
+PdfGen::Object::Object(Type _type, int _x, int _y, string _text, string _font,
+                       array<float, 3> _color = {0.0f, 0.0f, 0.0f},
+                       array<float, 3> _bgcolor = {1.0f, 1.0f, 1.0f}) {
+    type = _type;
+    x=_x;y=_y;
+    text = _text;
+    font = _font;
+    color = _color;
+    bgcolor = _bgcolor;
+    bool found = false;
+    for (PdfFont *f : fonts) {
+        if (f->GetMetrics().GetFontName() == font) {
+            found = true;
+            Font=f;
+            painter->TextState.SetFont(*f, 18);
+            cout << f->GetStringLength(text, painter->TextState);
+            break;
+        }
+    }
+    if (!found) {
+        PdfFont *f = document->GetFonts().SearchFont("Arial");
+        if (f == nullptr) {
+            Out::errorMessage("Can not find font " + font);
+            exit(1);
+        }
+        fonts.push_back(f);
+        Font=f;
+    }
+}
+
+PdfGen::Object::Object(Type _type, int _x, int _y, int _width, int _height, array<float, 3> _color, array<float, 3> _bgcolor) {
+    type = _type;
+    x=_x;y=_y;
+    width=_width;
+    height=_height;
+    color = _color;
+    bgcolor = _bgcolor;
+}
 
 PdfGen::PdfGen(vector<shared_ptr<Node>> _nodes) : nodes(_nodes) {}
 
 void PdfGen::genPdf() {
-    PdfMemDocument document;
-    PdfPainter painter;
-    PdfFont* font;
-
+    document = new PdfMemDocument();
+    painter = new PdfPainter();
     try {
-        auto& page = document.GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4));
-        painter.SetCanvas(page);
+        auto &page = document->GetPages().CreatePage(
+            PdfPage::CreateStandardPageSize(PdfPageSize::A4));
+        painter->SetCanvas(page);
 
-        font = document.GetFonts().SearchFont("Arial");
-        if (font == nullptr)
-            throw std::runtime_error("Invalid handle");
+        for (shared_ptr<Node> node : nodes) {
+            constructObjForNode(node);
+        }
 
-        auto& metrics = font->GetMetrics();
-        cout << "The font name is "<< metrics.GetFontName() << endl;
-        cout << "The family font name is " << metrics.GetFontFamilyName() << endl;
-        cout << "The font file path is " << metrics.GetFilePath() << endl;
-        cout << "The font face index is " << metrics.GetFaceIndex() << endl;
+        painter->FinishDrawing();
 
-        painter.TextState.SetFont(*font, 18);
+        document->GetMetadata().SetCreator(
+            PdfString("SDT - Scientific Document Tool (powered by PoDoFo)"));
+        document->GetMetadata().SetAuthor(PdfString(""));
+        document->GetMetadata().SetTitle(PdfString(""));
+        document->GetMetadata().SetSubject(PdfString(""));
+        document->GetMetadata().SetKeywords(vector<string>({""}));
 
-        painter.DrawText("ABCDEFGHIKLMNOPQRSTVXYZ", 56.69, page.GetRect().Height - 56.69);
-
+        document->Save(ArgsParser::output->getFilename());
+    } catch (PdfError &e) {
         try {
-            painter.DrawText("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЬЫЭЮЯ", 56.69, page.GetRect().Height - 80);
-        }
-        catch (PdfError& err) {
-            if (err.GetCode() == PdfErrorCode::InvalidFontData)
-                cout << "WARNING: The matched font \"" << metrics.GetFontName() << "\" doesn't support cyrillic" << endl;
-        }
-
-        painter.FinishDrawing();
-
-        document.GetMetadata().SetCreator(PdfString("SDT - Scientific Document Tool (powered by PoDoFo)"));
-        document.GetMetadata().SetAuthor(PdfString(""));
-        document.GetMetadata().SetTitle(PdfString(""));
-        document.GetMetadata().SetSubject(PdfString(""));
-        document.GetMetadata().SetKeywords(vector<string>({ ""}));
-
-        document.Save(ArgsParser::output->getFilename());
-    }
-    catch (PdfError& e){
-        try{painter.FinishDrawing();} catch (...){}
+            painter->FinishDrawing();
+        } catch (...) {}
         throw e;
+    }
+    delete painter;
+    delete document;
+}
+
+void PdfGen::constructObjForNode(shared_ptr<Node> node) {
+    if (node->name=="text") {
+        objs.push_back(make_shared<Object>(Object::Type::TEXT, 0, 0, node->text, "Arial"));
+    } else {
+        for (auto el : node->nodes) {
+            constructObjForNode(el);
+        }
     }
 }

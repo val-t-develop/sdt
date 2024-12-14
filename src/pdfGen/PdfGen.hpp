@@ -23,10 +23,36 @@
 #pragma once
 #include <Defs.hpp>
 #include <ast/Node.hpp>
+#include <podofo/podofo.h>
+
+using namespace PoDoFo;
+
 class PdfGen {
 public:
+    static vector<PdfFont*> fonts;
+    static PdfMemDocument* document;
+    static PdfPainter* painter;
+    class Object {
+    public:
+        enum class Type {
+            TEXT, RECT, IMG, VID
+        };
+        Type type;
+        int x, y;
+        int width;
+        int height;
+        string text;
+        array<float,3> color;
+        array<float,3> bgcolor;
+        string font;
+        PdfFont* Font;
+        Object(Type _type, int _x, int _y, string _text, string _font, array<float,3> _color, array<float,3> _bgcolor); // TEXT
+        Object(Type _type, int _x, int _y, int _width, int _height, array<float,3> _color, array<float,3> _bgcolor); // RECT
+    };
+
     vector<shared_ptr<Node>> nodes;
+    vector<shared_ptr<Object>> objs;
     PdfGen(vector<shared_ptr<Node>> _nodes);
     void genPdf();
-
+    void constructObjForNode(shared_ptr<Node> node);
 };

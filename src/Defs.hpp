@@ -33,6 +33,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <array>
 
 using std::cerr;
 using std::cout;
@@ -44,6 +45,7 @@ using std::shared_ptr;
 using std::string;
 using std::unique_ptr;
 using std::vector;
+using std::array;
 namespace fs = std::filesystem;
 using std::exception;
 using std::fstream;
