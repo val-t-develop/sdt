@@ -32,6 +32,7 @@ public:
     static vector<PdfFont*> fonts;
     static PdfMemDocument* document;
     static PdfPainter* painter;
+    static PdfPage* page;
     class Object {
     public:
         enum class Type {
@@ -48,6 +49,7 @@ public:
         PdfFont* Font;
         Object(Type _type, int _x, int _y, string _text, string _font, array<float,3> _color, array<float,3> _bgcolor); // TEXT
         Object(Type _type, int _x, int _y, int _width, int _height, array<float,3> _color, array<float,3> _bgcolor); // RECT
+        void render();
     };
 
     vector<shared_ptr<Node>> nodes;

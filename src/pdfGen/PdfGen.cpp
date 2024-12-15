@@ -27,6 +27,7 @@
 vector<PdfFont*> PdfGen::fonts;
 PdfMemDocument* PdfGen::document;
 PdfPainter* PdfGen::painter;
+PdfPage* PdfGen::page;
 
 PdfGen::Object::Object(Type _type, int _x, int _y, string _text, string _font,
                        array<float, 3> _color = {0.0f, 0.0f, 0.0f},
@@ -58,13 +59,31 @@ PdfGen::Object::Object(Type _type, int _x, int _y, string _text, string _font,
     }
 }
 
-PdfGen::Object::Object(Type _type, int _x, int _y, int _width, int _height, array<float, 3> _color, array<float, 3> _bgcolor) {
+PdfGen::Object::Object(Type _type, int _x, int _y, int _width, int _height,
+                       array<float, 3> _color, array<float, 3> _bgcolor) {
     type = _type;
-    x=_x;y=_y;
-    width=_width;
-    height=_height;
+    x = _x;
+    y = _y;
+    width = _width;
+    height = _height;
     color = _color;
     bgcolor = _bgcolor;
+}
+
+void PdfGen::Object::render() {
+    if (type == Type::TEXT) {
+        painter->TextState.SetFont(*Font, 18);
+        painter->DrawText(text, x, page->GetRect().Height-y-18);
+    } else if (type == Type::RECT) {
+        painter->GraphicsState.SetFillColor(PdfColor(1.0f, 0.0f, 0.0f));
+        painter->GraphicsState.SetStrokeColor(PdfColor(1.0f, 0.0f, 0.0f));
+        painter->DrawRectangle(x, y, width, height, PdfPathDrawMode::Fill);
+
+        // restore to black
+        painter->GraphicsState.SetFillColor(PdfColor(0.0f, 0.0f, 0.0f));
+        painter->GraphicsState.SetStrokeColor(PdfColor(0.0f, 0.0f, 0.0f));
+
+    }
 }
 
 PdfGen::PdfGen(vector<shared_ptr<Node>> _nodes) : nodes(_nodes) {}
@@ -73,13 +92,17 @@ void PdfGen::genPdf() {
     document = new PdfMemDocument();
     painter = new PdfPainter();
     try {
-        auto &page = document->GetPages().CreatePage(
-            PdfPage::CreateStandardPageSize(PdfPageSize::A4));
-        painter->SetCanvas(page);
+        page = &(document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
+        painter->SetCanvas(*page);
 
         for (shared_ptr<Node> node : nodes) {
             constructObjForNode(node);
         }
+
+        for (shared_ptr<Object> obj : objs) {
+            obj->render();
+        }
+
 
         painter->FinishDrawing();
 
@@ -104,6 +127,11 @@ void PdfGen::genPdf() {
 void PdfGen::constructObjForNode(shared_ptr<Node> node) {
     if (node->name=="text") {
         objs.push_back(make_shared<Object>(Object::Type::TEXT, 0, 0, node->text, "Arial"));
+    } else if (node->name=="rect") {
+        objs.insert(objs.begin(), make_shared<Object>(Object::Type::RECT, 0, 0, 100, 100, array<float,3>{1.0f, 0.0f, 0.0f}, array<float,3>{1.0f, 0.0f, 0.0f}));
+        for (auto el : node->nodes) {
+            constructObjForNode(el);
+        }
     } else {
         for (auto el : node->nodes) {
             constructObjForNode(el);
