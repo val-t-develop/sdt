@@ -93,7 +93,7 @@ void PdfGen::genPdf() {
         page = &(document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
         painter->SetCanvas(*page);
 
-        array<double,2> coord = {0.0,0.0};
+        array<double,3> coord = {0.0,0.0,0.0};
         for (shared_ptr<Node> node : nodes) {
             coord = constructObjForNode(node, coord);
         }
@@ -122,21 +122,27 @@ void PdfGen::genPdf() {
     delete document;
 }
 
-array<double,2> PdfGen::constructObjForNode(shared_ptr<Node> node, array<double,2> coord) {
+array<double,3> PdfGen::constructObjForNode(shared_ptr<Node> node, array<double,3> coord) {
     if (node->name=="text") {
-        auto obj = make_shared<Object>(Object::Type::TEXT, coord, node->text, "Arial");
+        auto obj = make_shared<Object>(Object::Type::TEXT, array<double,2>{coord[0], coord[1]}, node->text, "Arial");
         objs.push_back(obj);
-        return array<double,2>{coord[0]+obj->size[0], coord[1]+obj->size[1]};
+        return array<double,3>{coord[0]+obj->size[0], coord[1], coord[1]+obj->size[1]};
     } else if (node->name=="rect") {
         auto _coord = coord;
-        coord = array<double,2>{coord[0]+10, coord[1]+10};
+        coord = array<double,3>{coord[0]+10, coord[1]+10, coord[2]+10};
         for (auto el : node->nodes) {
             coord = constructObjForNode(el, coord);
         }
-        coord = array<double,2>{coord[0]+10, coord[1]+10};
-        auto obj = make_shared<Object>(Object::Type::RECT, _coord, array<double,2>{coord[0]-_coord[0], coord[1]-_coord[1]}, array<double,3>{1.0, 0.0, 0.0}, array<double,3>{1.0, 0.0, 0.0});
+        coord = array<double,3>{coord[0]+10, coord[1]+10, coord[2]+10};
+        auto _coord1 = _coord;
+        if (coord[0]>page->GetRect().Width-100) {
+            _coord1[0]=0;
+            _coord1[1]=coord[2];
+            _coord1[2]=2*coord[2]-coord[1];
+        }
+        auto obj = make_shared<Object>(Object::Type::RECT, array<double,2>{_coord1[0],_coord1[1]}, array<double,2>{coord[0]-_coord[0], coord[2]-_coord[1]}, array<double,3>{1.0, 0.0, 0.0}, array<double,3>{1.0, 0.0, 0.0});
         objs.insert(objs.begin(), obj);
-        return coord;
+        return array<double,3>{_coord1[0]+obj->size[0], _coord1[1], _coord1[2]};
     } else {
         for (shared_ptr<Node> el : node->nodes) {
             coord = constructObjForNode(el, coord);
