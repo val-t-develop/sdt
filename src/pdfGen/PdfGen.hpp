@@ -55,6 +55,6 @@ public:
     vector<shared_ptr<Object>> objs;
     PdfGen(vector<shared_ptr<Node>> _nodes);
     void genPdf();
-    void constructObjForNode(shared_ptr<Node> node);
+    array<double,2> constructObjForNode(shared_ptr<Node> node, array<double,2> coord);
     static array<double,2> convertCoord(array<double,2> coord);
 };

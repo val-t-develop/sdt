@@ -55,6 +55,10 @@ PdfGen::Object::Object(Type _type, array<double,2> _coord, string _text, string 
         fonts.push_back(f);
         Font=f;
     }
+
+    painter->TextState.SetFont(*Font, 18);
+    size[0] = Font->GetStringLength(text, painter->TextState);
+    size[1] = Font->GetLineSpacing(painter->TextState);
 }
 
 PdfGen::Object::Object(Type _type, array<double,2> _coord, array<double,2> _size,
@@ -89,14 +93,14 @@ void PdfGen::genPdf() {
         page = &(document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
         painter->SetCanvas(*page);
 
+        array<double,2> coord = {0.0,0.0};
         for (shared_ptr<Node> node : nodes) {
-            constructObjForNode(node);
+            coord = constructObjForNode(node, coord);
         }
 
         for (shared_ptr<Object> obj : objs) {
             obj->render();
         }
-
 
         painter->FinishDrawing();
 
@@ -118,18 +122,26 @@ void PdfGen::genPdf() {
     delete document;
 }
 
-void PdfGen::constructObjForNode(shared_ptr<Node> node) {
+array<double,2> PdfGen::constructObjForNode(shared_ptr<Node> node, array<double,2> coord) {
     if (node->name=="text") {
-        objs.push_back(make_shared<Object>(Object::Type::TEXT, array<double,2>{0.0, 0.0}, node->text, "Arial"));
+        auto obj = make_shared<Object>(Object::Type::TEXT, coord, node->text, "Arial");
+        objs.push_back(obj);
+        return array<double,2>{coord[0]+obj->size[0], coord[1]+obj->size[1]};
     } else if (node->name=="rect") {
-        objs.insert(objs.begin(), make_shared<Object>(Object::Type::RECT, array<double,2>{0.0, 0.0}, array<double,2>{100.0, 100.0}, array<double,3>{1.0, 0.0, 0.0}, array<double,3>{1.0, 0.0, 0.0}));
+        auto _coord = coord;
+        coord = array<double,2>{coord[0]+10, coord[1]+10};
         for (auto el : node->nodes) {
-            constructObjForNode(el);
+            coord = constructObjForNode(el, coord);
         }
+        coord = array<double,2>{coord[0]+10, coord[1]+10};
+        auto obj = make_shared<Object>(Object::Type::RECT, _coord, array<double,2>{coord[0]-_coord[0], coord[1]-_coord[1]}, array<double,3>{1.0, 0.0, 0.0}, array<double,3>{1.0, 0.0, 0.0});
+        objs.insert(objs.begin(), obj);
+        return coord;
     } else {
-        for (auto el : node->nodes) {
-            constructObjForNode(el);
+        for (shared_ptr<Node> el : node->nodes) {
+            coord = constructObjForNode(el, coord);
         }
+        return coord;
     }
 }
 
