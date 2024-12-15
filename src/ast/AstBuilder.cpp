@@ -130,6 +130,7 @@ vector<shared_ptr<Node>> AstBuilder::buildNodesList() {
         } else {
             string str;
             while (true) {
+                ch = '\0', ch1 = '\0';
                 try {
                     ch = src.at(currChar);
                     ch1 = src.at(currChar + 1);
@@ -138,6 +139,9 @@ vector<shared_ptr<Node>> AstBuilder::buildNodesList() {
                     str.push_back(ch1);
                     incCurrChar();
                     incCurrChar();
+                } else if (ch == '\0') {
+                    retNodes.push_back(make_shared<Node>("text", vector<shared_ptr<Node>>(), str));
+                    break;
                 } else if (ch != '<' && ch != '{') {
                     str.push_back(ch);
                     incCurrChar();
