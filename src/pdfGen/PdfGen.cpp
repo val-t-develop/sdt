@@ -70,11 +70,13 @@ void PdfGen::Object::render() {
     if (type == Type::TEXT) {
         painter->TextState.SetFont(*Font, 18);
         painter->GraphicsState.SetFillColor(PdfColor(color[0], color[1], color[2]));
-        painter->DrawText(text, coord[0], page->GetRect().Height-coord[1]-18);
+        auto tmp = convertCoord(coord);
+        painter->DrawText(text, tmp[0], tmp[1]-18);
     } else if (type == Type::RECT) {
         painter->GraphicsState.SetFillColor(PdfColor(bgcolor[0], bgcolor[1], bgcolor[2]));
         painter->GraphicsState.SetStrokeColor(PdfColor(color[0], color[1], color[2]));
-        painter->DrawRectangle(coord[0], coord[1], size[0], size[1], PdfPathDrawMode::Fill);
+        auto tmp = convertCoord(coord);
+        painter->DrawRectangle(tmp[0], tmp[1]-size[1], size[0], size[1], PdfPathDrawMode::Fill);
     }
 }
 
@@ -129,4 +131,8 @@ void PdfGen::constructObjForNode(shared_ptr<Node> node) {
             constructObjForNode(el);
         }
     }
+}
+
+array<double, 2> PdfGen::convertCoord(array<double, 2> coord) {
+    return array<double, 2>{coord[0]+50, page->GetRect().Height-coord[1]-50};
 }

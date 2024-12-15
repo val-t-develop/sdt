@@ -56,4 +56,5 @@ public:
     PdfGen(vector<shared_ptr<Node>> _nodes);
     void genPdf();
     void constructObjForNode(shared_ptr<Node> node);
+    static array<double,2> convertCoord(array<double,2> coord);
 };
