@@ -29,11 +29,11 @@ PdfMemDocument* PdfGen::document;
 PdfPainter* PdfGen::painter;
 PdfPage* PdfGen::page;
 
-PdfGen::Object::Object(Type _type, int _x, int _y, string _text, string _font,
-                       array<float, 3> _color = {0.0f, 0.0f, 0.0f},
-                       array<float, 3> _bgcolor = {1.0f, 1.0f, 1.0f}) {
+PdfGen::Object::Object(Type _type, array<double,2> _coord, string _text, string _font,
+                       array<double, 3> _color = {0.0, 0.0, 0.0},
+                       array<double, 3> _bgcolor = {1.0, 1.0, 1.0}) {
     type = _type;
-    x=_x;y=_y;
+    coord=_coord;
     text = _text;
     font = _font;
     color = _color;
@@ -43,8 +43,6 @@ PdfGen::Object::Object(Type _type, int _x, int _y, string _text, string _font,
         if (f->GetMetrics().GetFontName() == font) {
             found = true;
             Font=f;
-            painter->TextState.SetFont(*f, 18);
-            cout << f->GetStringLength(text, painter->TextState);
             break;
         }
     }
@@ -59,13 +57,11 @@ PdfGen::Object::Object(Type _type, int _x, int _y, string _text, string _font,
     }
 }
 
-PdfGen::Object::Object(Type _type, int _x, int _y, int _width, int _height,
-                       array<float, 3> _color, array<float, 3> _bgcolor) {
+PdfGen::Object::Object(Type _type, array<double,2> _coord, array<double,2> _size,
+                       array<double, 3> _color, array<double, 3> _bgcolor) {
     type = _type;
-    x = _x;
-    y = _y;
-    width = _width;
-    height = _height;
+    coord=_coord;
+    size = _size;
     color = _color;
     bgcolor = _bgcolor;
 }
@@ -73,16 +69,12 @@ PdfGen::Object::Object(Type _type, int _x, int _y, int _width, int _height,
 void PdfGen::Object::render() {
     if (type == Type::TEXT) {
         painter->TextState.SetFont(*Font, 18);
-        painter->DrawText(text, x, page->GetRect().Height-y-18);
+        painter->GraphicsState.SetFillColor(PdfColor(color[0], color[1], color[2]));
+        painter->DrawText(text, coord[0], page->GetRect().Height-coord[1]-18);
     } else if (type == Type::RECT) {
-        painter->GraphicsState.SetFillColor(PdfColor(1.0f, 0.0f, 0.0f));
-        painter->GraphicsState.SetStrokeColor(PdfColor(1.0f, 0.0f, 0.0f));
-        painter->DrawRectangle(x, y, width, height, PdfPathDrawMode::Fill);
-
-        // restore to black
-        painter->GraphicsState.SetFillColor(PdfColor(0.0f, 0.0f, 0.0f));
-        painter->GraphicsState.SetStrokeColor(PdfColor(0.0f, 0.0f, 0.0f));
-
+        painter->GraphicsState.SetFillColor(PdfColor(bgcolor[0], bgcolor[1], bgcolor[2]));
+        painter->GraphicsState.SetStrokeColor(PdfColor(color[0], color[1], color[2]));
+        painter->DrawRectangle(coord[0], coord[1], size[0], size[1], PdfPathDrawMode::Fill);
     }
 }
 
@@ -126,9 +118,9 @@ void PdfGen::genPdf() {
 
 void PdfGen::constructObjForNode(shared_ptr<Node> node) {
     if (node->name=="text") {
-        objs.push_back(make_shared<Object>(Object::Type::TEXT, 0, 0, node->text, "Arial"));
+        objs.push_back(make_shared<Object>(Object::Type::TEXT, array<double,2>{0.0, 0.0}, node->text, "Arial"));
     } else if (node->name=="rect") {
-        objs.insert(objs.begin(), make_shared<Object>(Object::Type::RECT, 0, 0, 100, 100, array<float,3>{1.0f, 0.0f, 0.0f}, array<float,3>{1.0f, 0.0f, 0.0f}));
+        objs.insert(objs.begin(), make_shared<Object>(Object::Type::RECT, array<double,2>{0.0, 0.0}, array<double,2>{100.0, 100.0}, array<double,3>{1.0, 0.0, 0.0}, array<double,3>{1.0, 0.0, 0.0}));
         for (auto el : node->nodes) {
             constructObjForNode(el);
         }

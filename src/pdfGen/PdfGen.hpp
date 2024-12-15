@@ -39,16 +39,15 @@ public:
             TEXT, RECT, IMG, VID
         };
         Type type;
-        int x, y;
-        int width;
-        int height;
+        array<double,2> coord;
+        array<double,2> size;
         string text;
-        array<float,3> color;
-        array<float,3> bgcolor;
+        array<double,3> color;
+        array<double,3> bgcolor;
         string font;
         PdfFont* Font;
-        Object(Type _type, int _x, int _y, string _text, string _font, array<float,3> _color, array<float,3> _bgcolor); // TEXT
-        Object(Type _type, int _x, int _y, int _width, int _height, array<float,3> _color, array<float,3> _bgcolor); // RECT
+        Object(Type _type, array<double,2> _coord, string _text, string _font, array<double,3> _color, array<double,3> _bgcolor); // TEXT
+        Object(Type _type, array<double,2> _coord, array<double,2> _size, array<double,3> _color, array<double,3> _bgcolor); // RECT
         void render();
     };
 
