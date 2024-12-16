@@ -128,21 +128,15 @@ array<double,3> PdfGen::constructObjForNode(shared_ptr<Node> node, array<double,
         objs.push_back(obj);
         return array<double,3>{coord[0]+obj->size[0], coord[1], coord[1]+obj->size[1]};
     } else if (node->name=="rect") {
-        auto _coord = coord;
-        coord = array<double,3>{coord[0]+10, coord[1]+10, coord[2]+10};
+        auto obj_coord = array<double,3>{coord[0]+10, coord[1]+10, coord[2]+10};
         for (auto el : node->nodes) {
-            coord = constructObjForNode(el, coord);
+            auto tmp = constructObjForNode(el, obj_coord);
+            obj_coord = array<double,3>{tmp[0], tmp[1], std::max(tmp[2],obj_coord[2])};
         }
-        coord = array<double,3>{coord[0]+10, coord[1]+10, coord[2]+10};
-        auto _coord1 = _coord;
-        if (coord[0]>page->GetRect().Width-100) {
-            _coord1[0]=0;
-            _coord1[1]=coord[2];
-            _coord1[2]=2*coord[2]-coord[1];
-        }
-        auto obj = make_shared<Object>(Object::Type::RECT, array<double,2>{_coord1[0],_coord1[1]}, array<double,2>{coord[0]-_coord[0], coord[2]-_coord[1]}, array<double,3>{1.0, 0.0, 0.0}, array<double,3>{1.0, 0.0, 0.0});
+        obj_coord = array<double,3>{obj_coord[0]+10, obj_coord[1]+10, obj_coord[2]+10};
+        auto obj = make_shared<Object>(Object::Type::RECT, array<double,2>{coord[0], coord[1]}, array<double,2>{obj_coord[0]-coord[0], obj_coord[2]-coord[1]}, array<double,3>{1.0, 0.0, 0.0}, array<double,3>{1.0, 0.0, 0.0});
         objs.insert(objs.begin(), obj);
-        return array<double,3>{_coord1[0]+obj->size[0], _coord1[1], _coord1[2]};
+        return array<double,3>{obj_coord[0], obj_coord[1]-20, obj_coord[2]};
     } else {
         for (shared_ptr<Node> el : node->nodes) {
             coord = constructObjForNode(el, coord);
