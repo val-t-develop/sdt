@@ -21,14 +21,14 @@
  *  Builder of AST.
  */
 #include "AstBuilder.hpp"
+
+#include <utils/ArgsParser.hpp>
 #include <utils/Out.hpp>
 
-AstBuilder::AstBuilder() {}
-
-AstBuilder::AstBuilder(Path &filePath) {
-    this->path = filePath;
-    this->src = filePath.readFile();
-    this->nodes = vector<shared_ptr<Node>>();
+AstBuilder::AstBuilder() {
+    nodes = vector<shared_ptr<Node>>();
+    path = ArgsParser::src;
+    src = path->readFile();
 }
 
 void AstBuilder::buildNodes() {

@@ -21,6 +21,7 @@
  *  Main project file.
  */
 #include <ast/AstBuilder.hpp>
+#include <confReader/ConfReader.hpp>
 #include <main.hpp>
 #include <pdfGen/PdfGen.hpp>
 #include <utils/Out.hpp>
@@ -29,18 +30,17 @@ int main(int argc, char **argv) { Main::main(argc, argv); return 0; }
 
 void Main::main(int argc, char **argv) {
     ArgsParser::parseArgs(argc, argv);
-    for (Path file : ArgsParser::src) {
-        if (file.isFile()) {
-            processFile(file);
-        } else if (file.isDir()) {
-            Out::errorMessage("Processing directories is unsupported");
+    if (ArgsParser::src->isFile()) {
+        AstBuilder ast_builder;
+        ast_builder.buildNodes();
+        PdfGen::setBasicObjTypes();
+        if (ArgsParser::conf!=nullptr) {
+            ConfReader conf_reader;
+            conf_reader.parse();
         }
+        PdfGen pdf_gen(ast_builder.nodes);
+        pdf_gen.genPdf();
+    } else if (ArgsParser::src->isDir()) {
+        Out::errorMessage("Processing directories is unsupported");
     }
-}
-
-void Main::processFile(Path &file) {
-    AstBuilder ast_builder(file);
-    ast_builder.buildNodes();
-    PdfGen pdf_gen(ast_builder.nodes);
-    pdf_gen.genPdf();
 }

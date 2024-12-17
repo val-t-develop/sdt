@@ -28,7 +28,8 @@
 class ArgsParser {
 public:
     static shared_ptr<Path> output;
-    static vector<Path> src;
+    static shared_ptr<Path> conf;
+    static shared_ptr<Path> src;
 
     static void parseArgs(int argc, char** argv);
     static void parseArgs(vector<string> args);

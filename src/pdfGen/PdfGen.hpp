@@ -46,10 +46,14 @@ public:
         array<double,3> bgcolor;
         string font;
         PdfFont* Font;
+        Object() = default;
+        Object(Type _type, array<double,2> _coord, array<double,2> _size, string _text, array<double,3> _color, array<double,3> _bgcolor, string _font); // __basic
         Object(Type _type, array<double,2> _coord, string _text, string _font, array<double,3> _color, array<double,3> _bgcolor); // TEXT
         Object(Type _type, array<double,2> _coord, array<double,2> _size, array<double,3> _color, array<double,3> _bgcolor); // RECT
         void render();
     };
+    static map<string, Object> objTypes;
+    static void setBasicObjTypes();
 
     vector<shared_ptr<Node>> nodes;
     vector<shared_ptr<Object>> objs;

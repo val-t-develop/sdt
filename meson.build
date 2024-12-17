@@ -23,6 +23,7 @@ project('sdt', 'cpp', default_options : 'cpp_std=c++20')
 add_project_arguments('-W', '-Wall', '-Wextra', '-Wpedantic', '-g', language : 'cpp')
 
 podofo_dep = dependency('libpodofo', version : '>=0.10.3')
+boost_dep = dependency('boost', modules : ['json'])
 
 incdir = include_directories('src')
 src_files = ['src/main.hpp', 'src/main.cpp',
@@ -30,8 +31,9 @@ src_files = ['src/main.hpp', 'src/main.cpp',
              'src/utils/Out.hpp', 'src/utils/Out.cpp',
              'src/utils/Path.hpp', 'src/utils/Path.cpp',
              'src/utils/ArgsParser.hpp', 'src/utils/ArgsParser.cpp',
+             'src/confReader/ConfReader.hpp', 'src/confReader/ConfReader.cpp',
              'src/ast/Node.hpp', 'src/ast/Node.cpp',
              'src/ast/AstBuilder.hpp', 'src/ast/AstBuilder.cpp',
              'src/pdfGen/PdfGen.hpp', 'src/pdfGen/PdfGen.cpp',]
 
-executable('sdt', src_files, dependencies : podofo_dep, include_directories : incdir)
+executable('sdt', src_files, dependencies : [podofo_dep, boost_dep], include_directories : incdir)

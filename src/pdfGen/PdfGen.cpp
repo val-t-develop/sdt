@@ -24,10 +24,21 @@
 #include <utils/ArgsParser.hpp>
 #include <utils/Out.hpp>
 
+map<string, PdfGen::Object> PdfGen::objTypes = map<string, Object>();
 vector<PdfFont*> PdfGen::fonts;
 PdfMemDocument* PdfGen::document;
 PdfPainter* PdfGen::painter;
 PdfPage* PdfGen::page;
+
+void PdfGen::setBasicObjTypes() {
+    objTypes["text"] = PdfGen::Object(Object::Type::TEXT, array<double,2>{0.0,0.0}, array<double,2>{0.0,0.0}, "", array<double,3>{0.0,0.0,0.0}, array<double,3>{1.0,1.0,1.0}, "Arial");
+    objTypes["rect"] = PdfGen::Object(Object::Type::RECT, array<double,2>{0.0,0.0}, array<double,2>{0.0,0.0}, "", array<double,3>{1.0,0.0,0.0}, array<double,3>{1.0,0.0,0.0}, "");
+}
+
+PdfGen::Object::Object(Type _type, array<double, 2> _coord,
+                       array<double, 2> _size, string _text,
+                       array<double, 3> _color, array<double, 3> _bgcolor,
+                       string _font) : type(_type), coord(_coord), size(_size), text(_text), color(_color), bgcolor(_bgcolor), font(_font), Font(nullptr) {}
 
 PdfGen::Object::Object(Type _type, array<double,2> _coord, string _text, string _font,
                        array<double, 3> _color = {0.0, 0.0, 0.0},
@@ -111,7 +122,7 @@ void PdfGen::genPdf() {
         document->GetMetadata().SetSubject(PdfString(""));
         document->GetMetadata().SetKeywords(vector<string>({""}));
 
-        document->Save(ArgsParser::output->getFilename());
+        document->Save(ArgsParser::output->getName());
     } catch (PdfError &e) {
         try {
             painter->FinishDrawing();
@@ -123,18 +134,18 @@ void PdfGen::genPdf() {
 }
 
 array<double,3> PdfGen::constructObjForNode(shared_ptr<Node> node, array<double,3> coord) {
-    if (node->name=="text") {
+    if (PdfGen::objTypes[node->name].type==Object::Type::TEXT) {
         auto obj = make_shared<Object>(Object::Type::TEXT, array<double,2>{coord[0], coord[1]}, node->text, "Arial");
         objs.push_back(obj);
         return array<double,3>{coord[0]+obj->size[0], coord[1], coord[1]+obj->size[1]};
-    } else if (node->name=="rect") {
+    } else if (PdfGen::objTypes[node->name].type==Object::Type::RECT) {
         auto obj_coord = array<double,3>{coord[0]+10, coord[1]+10, coord[2]+10};
         for (auto el : node->nodes) {
             auto tmp = constructObjForNode(el, obj_coord);
             obj_coord = array<double,3>{tmp[0], tmp[1], std::max(tmp[2],obj_coord[2])};
         }
         obj_coord = array<double,3>{obj_coord[0]+10, obj_coord[1]+10, obj_coord[2]+10};
-        auto obj = make_shared<Object>(Object::Type::RECT, array<double,2>{coord[0], coord[1]}, array<double,2>{obj_coord[0]-coord[0], obj_coord[2]-coord[1]}, array<double,3>{1.0, 0.0, 0.0}, array<double,3>{1.0, 0.0, 0.0});
+        auto obj = make_shared<Object>(Object::Type::RECT, array<double,2>{coord[0], coord[1]}, array<double,2>{obj_coord[0]-coord[0], obj_coord[2]-coord[1]}, PdfGen::objTypes[node->name].color, PdfGen::objTypes[node->name].bgcolor);
         objs.insert(objs.begin(), obj);
         return array<double,3>{obj_coord[0], obj_coord[1]-20, obj_coord[2]};
     } else {

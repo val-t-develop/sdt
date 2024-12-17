@@ -18,13 +18,14 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Reader of config file.
  */
-
 #pragma once
-#include <utils/ArgsParser.hpp>
+#include <boost/json.hpp>
 
-class Main {
+class ConfReader {
 public:
-    static void main(int argc, char** argv);
+    boost::json::object conf;
+    ConfReader();
+    void parse();
 };

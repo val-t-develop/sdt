@@ -25,7 +25,8 @@
 #include <utils/License.hpp>
 
 shared_ptr<Path> ArgsParser::output = nullptr;
-vector<Path> ArgsParser::src = vector<Path>();
+shared_ptr<Path> ArgsParser::conf = nullptr;
+shared_ptr<Path> ArgsParser::src = nullptr;
 
 void ArgsParser::parseArgs(int argc, char** argv) {
     string home = getenv("HOME");
@@ -52,6 +53,10 @@ void ArgsParser::parseArgs(vector<string> args) {
             i++;
             arg = args[i];
             output = make_shared<Path>(arg);
+        } else if (arg=="-c") {
+            i++;
+            arg = args[i];
+            conf = make_shared<Path>(arg);
         } else if (arg=="show") {
             i++;
             arg = args[i];
@@ -59,10 +64,10 @@ void ArgsParser::parseArgs(vector<string> args) {
                 Out::printMessage(LICENSE);
             }
         } else {
-            src.push_back(Path(arg));
+            src = make_shared<Path>(arg);
         }
     }
-    if (src.empty()) {
+    if (src == nullptr) {
         Out::printMessage("No input files.");
         exit(0);
     }

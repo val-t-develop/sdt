@@ -26,14 +26,13 @@
 
 class AstBuilder {
 public:
-    Path path;
+    shared_ptr<Path> path;
     string src;
     vector<shared_ptr<Node>> nodes;
     int currChar = 0;
     int currLine = 0, currPos = 0;
 
     AstBuilder();
-    AstBuilder(Path &filePath);
 
     void buildNodes();
     vector<shared_ptr<Node>> buildNodesList();
