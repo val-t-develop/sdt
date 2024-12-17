@@ -31,22 +31,23 @@ PdfPainter* PdfGen::painter;
 PdfPage* PdfGen::page;
 
 void PdfGen::setBasicObjTypes() {
-    objTypes["text"] = PdfGen::Object(Object::Type::TEXT, array<double,2>{0.0,0.0}, array<double,2>{0.0,0.0}, "", array<double,3>{0.0,0.0,0.0}, array<double,3>{1.0,1.0,1.0}, "Arial");
-    objTypes["rect"] = PdfGen::Object(Object::Type::RECT, array<double,2>{0.0,0.0}, array<double,2>{0.0,0.0}, "", array<double,3>{1.0,0.0,0.0}, array<double,3>{1.0,0.0,0.0}, "");
+    objTypes["text"] = PdfGen::Object(Object::Type::TEXT, array<double,2>{0.0,0.0}, array<double,2>{0.0,0.0}, "", array<double,3>{0.0,0.0,0.0}, array<double,3>{1.0,1.0,1.0}, "Arial", 18.0);
+    objTypes["rect"] = PdfGen::Object(Object::Type::RECT, array<double,2>{0.0,0.0}, array<double,2>{0.0,0.0}, "", array<double,3>{1.0,0.0,0.0}, array<double,3>{1.0,0.0,0.0}, "", 18.0);
 }
 
 PdfGen::Object::Object(Type _type, array<double, 2> _coord,
                        array<double, 2> _size, string _text,
                        array<double, 3> _color, array<double, 3> _bgcolor,
-                       string _font) : type(_type), coord(_coord), size(_size), text(_text), color(_color), bgcolor(_bgcolor), font(_font), Font(nullptr) {}
+                       string _font, double _font_size) : type(_type), coord(_coord), size(_size), text(_text), color(_color), bgcolor(_bgcolor), font(_font), font_size(_font_size), Font(nullptr) {}
 
-PdfGen::Object::Object(Type _type, array<double,2> _coord, string _text, string _font,
-                       array<double, 3> _color = {0.0, 0.0, 0.0},
-                       array<double, 3> _bgcolor = {1.0, 1.0, 1.0}) {
+PdfGen::Object::Object(Type _type, array<double,2> _coord, string _text, string _font, double _font_size,
+                       array<double, 3> _color,
+                       array<double, 3> _bgcolor) {
     type = _type;
     coord=_coord;
     text = _text;
     font = _font;
+    font_size = _font_size;
     color = _color;
     bgcolor = _bgcolor;
     bool found = false;
@@ -67,7 +68,7 @@ PdfGen::Object::Object(Type _type, array<double,2> _coord, string _text, string 
         Font=f;
     }
 
-    painter->TextState.SetFont(*Font, 18);
+    painter->TextState.SetFont(*Font, font_size);
     size[0] = Font->GetStringLength(text, painter->TextState);
     size[1] = Font->GetLineSpacing(painter->TextState);
 }
@@ -83,10 +84,10 @@ PdfGen::Object::Object(Type _type, array<double,2> _coord, array<double,2> _size
 
 void PdfGen::Object::render() {
     if (type == Type::TEXT) {
-        painter->TextState.SetFont(*Font, 18);
+        painter->TextState.SetFont(*Font, font_size);
         painter->GraphicsState.SetFillColor(PdfColor(color[0], color[1], color[2]));
         auto tmp = convertCoord(coord);
-        painter->DrawText(text, tmp[0], tmp[1]-18);
+        painter->DrawText(text, tmp[0], tmp[1]-font_size);
     } else if (type == Type::RECT) {
         painter->GraphicsState.SetFillColor(PdfColor(bgcolor[0], bgcolor[1], bgcolor[2]));
         painter->GraphicsState.SetStrokeColor(PdfColor(color[0], color[1], color[2]));
@@ -135,7 +136,7 @@ void PdfGen::genPdf() {
 
 array<double,3> PdfGen::constructObjForNode(shared_ptr<Node> node, array<double,3> coord) {
     if (PdfGen::objTypes[node->name].type==Object::Type::TEXT) {
-        auto obj = make_shared<Object>(Object::Type::TEXT, array<double,2>{coord[0], coord[1]}, node->text, "Arial");
+        auto obj = make_shared<Object>(Object::Type::TEXT, array<double,2>{coord[0], coord[1]}, node->text, objTypes[node->name].font, objTypes[node->name].font_size, objTypes[node->name].color, objTypes[node->name].bgcolor);
         objs.push_back(obj);
         return array<double,3>{coord[0]+obj->size[0], coord[1], coord[1]+obj->size[1]};
     } else if (PdfGen::objTypes[node->name].type==Object::Type::RECT) {

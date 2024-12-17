@@ -80,6 +80,20 @@ void ConfReader::parse() {
                                 }
                                 obj.bgcolor = array<double,3>{bgcolor_arr[0].as_double(), bgcolor_arr[1].as_double(), bgcolor_arr[2].as_double()};
                             }
+                            if (params.contains("font")) {
+                                auto font_v = params["font"];
+                                if (!font_v.is_string()) {
+                                    Out::errorMessage("Argument 'font' for node " + name + " is not string");
+                                }
+                                obj.font = string(font_v.as_string().c_str());
+                            }
+                            if (params.contains("font_size")) {
+                                auto font_size_v = params["font_size"];
+                                if (!font_size_v.is_number()) {
+                                    Out::errorMessage("Argument 'font_size' for node " + name + " is not numeric");
+                                }
+                                obj.font_size = font_size_v.as_double();
+                            }
                             PdfGen::objTypes[name]=obj;
                         } else {
                             Out::errorMessage("Can not find 'base' for node " + name);

@@ -45,10 +45,11 @@ public:
         array<double,3> color;
         array<double,3> bgcolor;
         string font;
+        double font_size;
         PdfFont* Font;
         Object() = default;
-        Object(Type _type, array<double,2> _coord, array<double,2> _size, string _text, array<double,3> _color, array<double,3> _bgcolor, string _font); // __basic
-        Object(Type _type, array<double,2> _coord, string _text, string _font, array<double,3> _color, array<double,3> _bgcolor); // TEXT
+        Object(Type _type, array<double,2> _coord, array<double,2> _size, string _text, array<double,3> _color, array<double,3> _bgcolor, string _font, double _font_size); // __basic
+        Object(Type _type, array<double,2> _coord, string _text, string _font, double _font_size, array<double,3> _color, array<double,3> _bgcolor); // TEXT
         Object(Type _type, array<double,2> _coord, array<double,2> _size, array<double,3> _color, array<double,3> _bgcolor); // RECT
         void render();
     };
