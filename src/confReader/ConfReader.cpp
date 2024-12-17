@@ -44,10 +44,42 @@ void ConfReader::parse() {
                         auto params = node.value().as_object();
                         if (params.contains("base")) {
                             auto base_v = params["base"];
-                            if (base_v.is_string()) {}
+                            if (!base_v.is_string()) {
+                                Out::errorMessage("Argument 'base' for node " + name + " is not string");
+                            }
                             PdfGen::Object obj = PdfGen::objTypes[string(base_v.as_string().c_str())];
-                            obj.bgcolor=array<double,3>{0.5,0.5,0.5};
-                            obj.color=array<double,3>{0.5,0.5,0.5};
+                            if (params.contains("color")) {
+                                auto color_v = params["color"];
+                                if (!color_v.is_array()) {
+                                    Out::errorMessage("Argument 'color' for node " + name + " is not array");
+                                }
+                                auto color_arr = color_v.as_array();
+                                if (color_arr.size() != 3) {
+                                    Out::errorMessage("Argument 'color' for node " + name + " is not array of 3 elements");
+                                }
+                                for (auto& el : color_arr) {
+                                    if (!el.is_number()) {
+                                        Out::errorMessage("Argument 'color' for node " + name + " is not numeric array");
+                                    }
+                                }
+                                obj.color = array<double,3>{color_arr[0].as_double(), color_arr[1].as_double(), color_arr[2].as_double()};
+                            }
+                            if (params.contains("bgcolor")) {
+                                auto bgcolor_v = params["bgcolor"];
+                                if (!bgcolor_v.is_array()) {
+                                    Out::errorMessage("Argument 'bgcolor' for node " + name + " is not array");
+                                }
+                                auto bgcolor_arr = bgcolor_v.as_array();
+                                if (bgcolor_arr.size() != 3) {
+                                    Out::errorMessage("Argument 'bgcolor' for node " + name + " is not array of 3 elements");
+                                }
+                                for (auto& el : bgcolor_arr) {
+                                    if (!el.is_number()) {
+                                        Out::errorMessage("Argument 'bgcolor' for node " + name + " is not numeric array");
+                                    }
+                                }
+                                obj.bgcolor = array<double,3>{bgcolor_arr[0].as_double(), bgcolor_arr[1].as_double(), bgcolor_arr[2].as_double()};
+                            }
                             PdfGen::objTypes[name]=obj;
                         } else {
                             Out::errorMessage("Can not find 'base' for node " + name);
