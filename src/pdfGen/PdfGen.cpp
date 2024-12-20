@@ -67,10 +67,33 @@ PdfGen::Object::Object(Type _type, array<double,2> _coord, string _text, string 
         fonts.push_back(f);
         Font=f;
     }
-
     painter->TextState.SetFont(*Font, font_size);
-    size[0] = Font->GetStringLength(text, painter->TextState);
-    size[1] = Font->GetLineSpacing(painter->TextState);
+    int last_space = 0, last_break = 0;
+    for (int i=0; i<text.size(); i++) {
+        if (text[i]==' ') {
+            string substr = text.substr(last_break, i-last_break+1);
+            double l = Font->GetStringLength(substr, painter->TextState);
+            if (last_space == 0) {
+                if (coord[0]+l>page->GetRect().Width-100) {
+                    last_break = last_space;
+                    text_splits.push_back(last_break);
+                }
+            } else {
+                if (l>page->GetRect().Width-100) {
+                    last_break = last_space;
+                    text_splits.push_back(last_break);
+                }
+            }
+            last_space = i;
+        }
+    }
+
+    if (text_splits.empty()) {
+        size[0] = Font->GetStringLength(text, painter->TextState);
+    } else {
+        size[0] = Font->GetStringLength(text.substr(text_splits[text_splits.size()-1], text.size()), painter->TextState)-coord[0];
+    }
+    size[1] = Font->GetLineSpacing(painter->TextState)*(text_splits.size()+1);
 }
 
 PdfGen::Object::Object(Type _type, array<double,2> _coord, array<double,2> _size,
@@ -87,7 +110,20 @@ void PdfGen::Object::render() {
         painter->TextState.SetFont(*Font, font_size);
         painter->GraphicsState.SetFillColor(PdfColor(color[0], color[1], color[2]));
         auto tmp = convertCoord(coord);
-        painter->DrawText(text, tmp[0], tmp[1]-font_size);
+        if (text_splits.empty()) {
+            painter->DrawText(text, tmp[0], tmp[1]-font_size);
+        } else {
+            int last_break = 0;
+            for (int i=0; i<text_splits.size(); i++) {
+                if (i==0) {
+                    painter->DrawText(text.substr(last_break, text_splits[i]), tmp[0], tmp[1]-font_size);
+                } else {
+                    painter->DrawText(text.substr(last_break, text_splits[i]), 50, tmp[1]-font_size*(i+1));
+                }
+                last_break = text_splits[i];
+            }
+            painter->DrawText(text.substr(last_break, text.size()), 50, tmp[1]-font_size*(text_splits.size()+1));
+        }
     } else if (type == Type::RECT) {
         painter->GraphicsState.SetFillColor(PdfColor(bgcolor[0], bgcolor[1], bgcolor[2]));
         painter->GraphicsState.SetStrokeColor(PdfColor(color[0], color[1], color[2]));
@@ -138,7 +174,7 @@ array<double,3> PdfGen::constructObjForNode(shared_ptr<Node> node, array<double,
     if (PdfGen::objTypes[node->name].type==Object::Type::TEXT) {
         auto obj = make_shared<Object>(Object::Type::TEXT, array<double,2>{coord[0], coord[1]}, node->text, objTypes[node->name].font, objTypes[node->name].font_size, objTypes[node->name].color, objTypes[node->name].bgcolor);
         objs.push_back(obj);
-        return array<double,3>{coord[0]+obj->size[0], coord[1], coord[1]+obj->size[1]};
+        return array<double,3>{coord[0]+obj->size[0], coord[1]+obj->size[1]-obj->font_size, coord[1]+obj->size[1]};
     } else if (PdfGen::objTypes[node->name].type==Object::Type::RECT) {
         auto obj_coord = array<double,3>{coord[0]+10, coord[1]+10, coord[2]+10};
         for (auto el : node->nodes) {

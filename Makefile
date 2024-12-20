@@ -42,4 +42,4 @@ build:
 	cd builddir && meson compile && cd ..
 
 run: 
-	echo '\n\n\n' && ./builddir/$(EXE) res/test.sdt -o res/res.pdf && echo '\n\n\n'
+	echo '\n\n\n' && ./builddir/$(EXE) res/test.sdt -c res/conf.json -o res/test.pdf && echo '\n\n\n'
