@@ -29,6 +29,7 @@ vector<PdfFont*> PdfGen::fonts;
 PdfMemDocument* PdfGen::document;
 PdfPainter* PdfGen::painter;
 PdfPage* PdfGen::page;
+double PdfGen::margin_x = 50, PdfGen::margin_y = 50;
 
 void PdfGen::setBasicObjTypes() {
     objTypes["text"] = PdfGen::Object(Object::Type::TEXT, array<double,2>{0.0,0.0}, array<double,2>{0.0,0.0}, "", array<double,3>{0.0,0.0,0.0}, array<double,3>{1.0,1.0,1.0}, "Arial", 18.0);
@@ -74,12 +75,12 @@ PdfGen::Object::Object(Type _type, array<double,2> _coord, string _text, string 
             string substr = text.substr(last_break, i-last_break+1);
             double l = Font->GetStringLength(substr, painter->TextState);
             if (last_space == 0) {
-                if (coord[0]+l>page->GetRect().Width-100) {
+                if (coord[0]+l>page->GetRect().Width-margin_x*2) {
                     last_break = last_space;
                     text_splits.push_back(last_break);
                 }
             } else {
-                if (l>page->GetRect().Width-100) {
+                if (l>page->GetRect().Width-margin_x*2) {
                     last_break = last_space;
                     text_splits.push_back(last_break);
                 }
@@ -118,11 +119,11 @@ void PdfGen::Object::render() {
                 if (i==0) {
                     painter->DrawText(text.substr(last_break, text_splits[i]), tmp[0], tmp[1]-font_size);
                 } else {
-                    painter->DrawText(text.substr(last_break, text_splits[i]), 50, tmp[1]-font_size*(i+1));
+                    painter->DrawText(text.substr(last_break, text_splits[i]), margin_x, tmp[1]-font_size*(i+1));
                 }
                 last_break = text_splits[i];
             }
-            painter->DrawText(text.substr(last_break, text.size()), 50, tmp[1]-font_size*(text_splits.size()+1));
+            painter->DrawText(text.substr(last_break, text.size()), margin_x, tmp[1]-font_size*(text_splits.size()+1));
         }
     } else if (type == Type::RECT) {
         painter->GraphicsState.SetFillColor(PdfColor(bgcolor[0], bgcolor[1], bgcolor[2]));
@@ -194,5 +195,5 @@ array<double,3> PdfGen::constructObjForNode(shared_ptr<Node> node, array<double,
 }
 
 array<double, 2> PdfGen::convertCoord(array<double, 2> coord) {
-    return array<double, 2>{coord[0]+50, page->GetRect().Height-coord[1]-50};
+    return array<double, 2>{coord[0]+margin_x, page->GetRect().Height-coord[1]-margin_y};
 }

@@ -33,6 +33,7 @@ public:
     static PdfMemDocument* document;
     static PdfPainter* painter;
     static PdfPage* page;
+    static double margin_x, margin_y;
     class Object {
         PdfFont * Font;
         vector<int> text_splits = vector<int>();
@@ -59,9 +60,6 @@ public:
 
     vector<shared_ptr<Node>> nodes;
     vector<shared_ptr<Object>> objs;
-
-    array<double,2> prev_coord;
-    array<double,2> prev_size;
 
     PdfGen(vector<shared_ptr<Node>> _nodes);
     void genPdf();

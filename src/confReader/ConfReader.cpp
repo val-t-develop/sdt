@@ -58,8 +58,8 @@ void ConfReader::parse() {
                                     Out::errorMessage("Argument 'color' for node " + name + " is not array of 3 elements");
                                 }
                                 for (auto& el : color_arr) {
-                                    if (!el.is_number()) {
-                                        Out::errorMessage("Argument 'color' for node " + name + " is not numeric array");
+                                    if (!el.is_double()) {
+                                        Out::errorMessage("Argument 'color' for node " + name + " is not double array");
                                     }
                                 }
                                 obj.color = array<double,3>{color_arr[0].as_double(), color_arr[1].as_double(), color_arr[2].as_double()};
@@ -74,8 +74,8 @@ void ConfReader::parse() {
                                     Out::errorMessage("Argument 'bgcolor' for node " + name + " is not array of 3 elements");
                                 }
                                 for (auto& el : bgcolor_arr) {
-                                    if (!el.is_number()) {
-                                        Out::errorMessage("Argument 'bgcolor' for node " + name + " is not numeric array");
+                                    if (!el.is_double()) {
+                                        Out::errorMessage("Argument 'bgcolor' for node " + name + " is not double array");
                                     }
                                 }
                                 obj.bgcolor = array<double,3>{bgcolor_arr[0].as_double(), bgcolor_arr[1].as_double(), bgcolor_arr[2].as_double()};
@@ -89,15 +89,41 @@ void ConfReader::parse() {
                             }
                             if (params.contains("font_size")) {
                                 auto font_size_v = params["font_size"];
-                                if (!font_size_v.is_number()) {
+                                if (font_size_v.is_double()) {
+                                    obj.font_size = font_size_v.as_double();
+                                } else if (font_size_v.is_int64()) {
+                                    obj.font_size = double(font_size_v.as_int64());
+                                } else {
                                     Out::errorMessage("Argument 'font_size' for node " + name + " is not numeric");
                                 }
-                                obj.font_size = font_size_v.as_double();
                             }
                             PdfGen::objTypes[name]=obj;
                         } else {
                             Out::errorMessage("Can not find 'base' for node " + name);
                         }
+                    }
+                }
+            }
+        } else if (param.key() == "document") {
+            if (param.value().is_object()) {
+                auto params = param.value().as_object();
+                for (auto param : params) {
+                    if (param.key() == "margin_x") {
+                        if (param.value().is_double()) {
+                            PdfGen::margin_x = param.value().as_double();
+                        } else if (param.value().is_int64()) {
+                            PdfGen::margin_x = double(param.value().as_int64());
+                        } else {
+                            Out::errorMessage("Argument 'margin_x' is not numeric");
+                        }
+                    } else if (param.key() == "margin_y") {
+                        if (param.value().is_number()) {
+                            PdfGen::margin_y = param.value().as_double();
+                        } else {
+                            Out::errorMessage("Argument 'margin_y' is not numeric");
+                        }
+                    } else {
+                        Out::errorMessage("Unknown argument '" + string(param.key()) + "'.");
                     }
                 }
             }
