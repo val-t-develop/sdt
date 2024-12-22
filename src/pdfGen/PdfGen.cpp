@@ -149,19 +149,19 @@ array<double, 3> PdfGen::genNode(xmlNode *node, map<string, string> &args,
             int last_break = 0;
             for (int i = 0; i < text_splits.size(); i++) {
                 if (i == 0) {
-                    painter->DrawText(text.substr(last_break, text_splits[i]),
-                                      tmp[0], tmp[1] - stod(args["fon_size"]));
+                    painter->DrawText(text.substr(last_break, text_splits[i]+1),
+                                      tmp[0], tmp[1] - stod(args["font_size"]));
                 } else {
-                    painter->DrawText(text.substr(last_break, text_splits[i]),
+                    painter->DrawText(text.substr(last_break+1, text_splits[i]+1),
                                       stod(args["doc_margin_x"]),
                                       tmp[1] -
-                                          stod(args["fon_size"]) * (i + 1));
+                                          stod(args["font_size"]) * (i + 1));
                 }
                 last_break = text_splits[i];
             }
-            painter->DrawText(text.substr(last_break, text.size()),
+            painter->DrawText(text.substr(last_break+1, text.size()),
                               stod(args["doc_margin_x"]),
-                              tmp[1] - stod(args["fon_size"]) *
+                              tmp[1] - stod(args["font_size"]) *
                                            (text_splits.size() + 1));
         }
         return array<double, 3>{coord[0] + size[0],

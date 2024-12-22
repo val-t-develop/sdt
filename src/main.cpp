@@ -37,7 +37,7 @@ void Main::main(int argc, char **argv) {
         }
         PdfGen pdf_gen{};
         pdf_gen.gen();
-    } else if (ArgsParser::src->isDir()) {
+    } else  {
         Out::errorMessage("Processing directories is unsupported");
     }
 }
