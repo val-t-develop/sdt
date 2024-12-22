@@ -24,19 +24,29 @@
 #include <Defs.hpp>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <podofo/podofo.h>
+using namespace PoDoFo;
 
 class PdfGen {
 public:
     class Obj {
     public:
-        map<string,double> num_args;
-        map<string,string> str_args;
-        map<string,array<double,2>> num2_args;
-        map<string,array<double,3>> num3_args;
+        string base;
+        map<string,string> args;
     };
-    static vector<Obj> objs;
-    xmlDoc *document;
+    static map<string, Obj> objs;
+
+    xmlDoc *xml_document;
+
+    vector<PdfFont*> fonts;
+    PdfMemDocument* document;
+    PdfPainter* painter;
+    PdfPage* page;
+
     PdfGen();
     ~PdfGen();
     void gen();
+
+    array<double,3> genNode(xmlNode* node, map<string,string>& args, array<double,3> coord);
+    array<double,2> convertCoord(array<double,2> coord, map<string,string>& args);
 };
