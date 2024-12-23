@@ -32,7 +32,6 @@ PdfGen::PdfGen() {
 }
 
 PdfGen::~PdfGen() {
-    xmlFreeDoc(xml_document);
     xmlCleanupParser();
 }
 
@@ -86,11 +85,29 @@ array<double, 3> PdfGen::genNode(xmlNode *node, map<string, string> &args,
         for (auto el : obj.args) {
             new_args[el.first] = el.second;
         }
-        for (xmlNode *el = node->children; node; node = node->next) {
-            genNode(el, new_args, array<double, 3>{0.0, 0.0, 0.0});
-        }
+
         if (obj.base == "") {
-            // TODO rect, img, vid
+            if (string(reinterpret_cast<const char*>(node->name))=="__rect") {
+
+                PdfPage* new_page = &(document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
+                painter->SetCanvas(*new_page);
+                array<double, 3> end = coord;
+                for (xmlNode *el = node->children; el; el = el->next) {
+                    end = genNode(el, new_args, end);
+                }
+                document->GetPages().RemovePageAt(new_page->GetIndex());
+                painter->SetCanvas(*page);
+                painter->GraphicsState.SetFillColor(PdfColor(1.0,0.0,0.0));
+                painter->GraphicsState.SetStrokeColor(PdfColor(0.0,1.0,0.0));
+                auto tmp = convertCoord(array<double,2>{coord[0], coord[1]}, new_args);
+                painter->DrawRectangle(tmp[0], tmp[1]-end[2]+coord[1], end[0]-coord[0], end[2]-coord[1], PdfPathDrawMode::Fill);
+                end = coord;
+                for (xmlNode *el = node->children; el; el = el->next) {
+                    end = genNode(el, new_args, end);
+                }
+            }
+            // TODO img, vid
+            return coord;
         } else {
             node->name = reinterpret_cast<const xmlChar *>(obj.base.c_str());
             return genNode(node, new_args, coord);
@@ -105,7 +122,7 @@ array<double, 3> PdfGen::genNode(xmlNode *node, map<string, string> &args,
             throw std::runtime_error("Invalid handle");
 
         painter->TextState.SetFont(*font, stod(args["font_size"]));
-        // painter->GraphicsState.SetFillColor(PdfColor());
+        painter->GraphicsState.SetFillColor(PdfColor(0.0,0.0,0.0));
         string text = string(reinterpret_cast<char *>(node->content));
 
         vector<int> text_splits{};
