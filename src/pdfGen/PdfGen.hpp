@@ -48,8 +48,8 @@ public:
     void gen();
 
     /*
-     *  coord - {coordinates that you should try to use first, coordinates}
+     *  coord - {coordinates origin, coordinates that you should try to use first, coordinates, max_left, max_right}
      *  returns {coordinates that have been used, size, coordinates that you should try to use first when rendering next object}
      */
-    array<double,6> genNode(xmlNode* node, map<string,string>& args, array<double,4> coord);
+    array<double,6> genNode(xmlNode* node, map<string,string>& args, array<double,8> pos);
 };
