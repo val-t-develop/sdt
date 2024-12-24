@@ -143,7 +143,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args,
                 string substr = text.substr(last_break, i-last_break+1);
                 if (font->GetStringLength(substr, painter->TextState)+substr_coord_x>page->GetRect().Width-stod(args["doc_margin_x"])*2) {
                     string s = text.substr(last_break,last_space-last_break+1);
-                    painter->DrawText(s, substr_coord_x+stod(args["doc_margin_x"]), page->GetRect().Height-(lines+1)*font->GetLineSpacing(painter->TextState)-coord[1]-stod(args["doc_margin_y"]));
+                    painter->DrawText(s, substr_coord_x+stod(args["doc_margin_x"]), page->GetRect().Height-lines*font->GetLineSpacing(painter->TextState)-coord[1]-stod(args["doc_margin_y"])-stod(args["font_size"]));
                     last_break = last_space+1;
                     substr_coord_x = 0;
                     lines++;
@@ -151,13 +151,13 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args,
                 last_space = i;
             }
         }
-        painter->DrawText(text.substr(last_break,text.length()), substr_coord_x+stod(args["doc_margin_x"]), page->GetRect().Height-(lines+1)*font->GetLineSpacing(painter->TextState)-coord[1]-stod(args["doc_margin_y"]));
+        painter->DrawText(text.substr(last_break,text.length()), substr_coord_x+stod(args["doc_margin_x"]), page->GetRect().Height-lines*font->GetLineSpacing(painter->TextState)-coord[1]-stod(args["doc_margin_y"])-stod(args["font_size"]));
         lines++;
         return array<double, 6>{coord[0], coord[1],
             (lines==1 ? font->GetStringLength(text, painter->TextState) : page->GetRect().Width-stod(args["doc_margin_x"])*2),
-            (lines+1)*font->GetLineSpacing(painter->TextState),
+            lines*font->GetLineSpacing(painter->TextState),
             font->GetStringLength(text.substr(last_break,text.length()), painter->TextState)+stod(args["doc_margin_x"])+substr_coord_x,
-            page->GetRect().Height-lines*font->GetLineSpacing(painter->TextState)-coord[1]-stod(args["doc_margin_y"])};
+            page->GetRect().Height-lines*font->GetLineSpacing(painter->TextState)-coord[1]-stod(args["doc_margin_y"])-stod(args["font_size"])};
     } else {
         Out::errorMessage("Unsupported xml node type");
         return array<double, 6>{-1, -1, -1, -1, -1, -1};
