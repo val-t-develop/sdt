@@ -103,8 +103,11 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args,
                 painter->SetCanvas(*page);
                 painter->GraphicsState.SetFillColor(PdfColor(1.0,0.0,0.0));
                 painter->GraphicsState.SetStrokeColor(PdfColor(0.0,1.0,0.0));
-                auto tmp = convertCoord(array<double,2>{coord[0], coord[1]}, new_args);
-                painter->DrawRectangle(tmp[0], tmp[1]-end[3]+coord[1], end[2]-coord[0], end[3]-coord[1], PdfPathDrawMode::Fill);
+                painter->DrawRectangle(coord[0]+stod(args["doc_margin_x"]),
+                    page->GetRect().Height-stod(args["doc_margin_y"])-end[3],
+                    end[2]-coord[0],
+                    end[3]-coord[1],
+                    PdfPathDrawMode::Fill);
                 end = coord;
                 for (xmlNode *el = node->children; el; el = el->next) {
                     auto t = genNode(el, new_args, end);
@@ -159,8 +162,4 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args,
         Out::errorMessage("Unsupported xml node type");
         return array<double, 6>{-1, -1, -1, -1, -1, -1};
     }
-}
-
-array<double, 2> PdfGen::convertCoord(array<double,2> coord, map<string, string> &args) {
-    return array<double, 2>{coord[0]+stod(args["doc_margin_x"]), page->GetRect().Height-coord[1]-stod(args["doc_margin_y"])};
 }
