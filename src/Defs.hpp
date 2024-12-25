@@ -53,6 +53,8 @@ using std::ifstream;
 using std::map;
 using std::ofstream;
 using std::stack;
+using std::max;
+using std::min;
 
 vector<string> split(string s, string delimiter);
 int64_t power(int base, int exponent);
