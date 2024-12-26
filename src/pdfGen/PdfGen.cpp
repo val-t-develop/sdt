@@ -55,7 +55,7 @@ void PdfGen::gen() {
             auto t = genNode(node, root_args, child_pos);
             child_pos[2] = t[4];
             child_pos[3] = t[5];
-            child_pos[4] = t[2]+t[0];
+            child_pos[4] = 0;
             child_pos[5] = t[3]+t[1];
         }
 
@@ -107,10 +107,10 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 painter->SetCanvas(*page);
                 painter->GraphicsState.SetFillColor(PdfColor(1.0,0.0,0.0));
                 painter->GraphicsState.SetStrokeColor(PdfColor(0.0,1.0,0.0));
-                painter->DrawRectangle(max(pos[2],pos[6])+pos[0],
+                painter->DrawRectangle(max(pos[4],pos[6])+pos[0],
                     page->GetRect().Height-stod(args["doc_margin_y"])-child_pos[5]-child_pos[1],
-                    child_pos[4]+child_pos[0]-pos[2],
-                    child_pos[5]+child_pos[1]-pos[3],
+                    child_pos[4]+child_pos[0]-pos[4],
+                    child_pos[5]+child_pos[1]-pos[5],
                     PdfPathDrawMode::Fill);
                 child_pos = array<double, 8>{pos[4], pos[5], 0.0, 0.0, 0.0, 0.0, pos[6]-pos[4], pos[7]-pos[4]};
                 for (xmlNode *el = node->children; el; el = el->next) {
