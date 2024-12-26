@@ -28,7 +28,7 @@ map<string, PdfGen::Obj> PdfGen::objs = map<string, PdfGen::Obj>();
 
 PdfGen::PdfGen() {
     xmlInitParser();
-    xml_document = xmlReadFile(ArgsParser::src->getName().c_str(), NULL, 0);
+    xml_document = xmlReadFile(ArgsParser::src->getName().c_str(), NULL, XML_PARSE_NOBLANKS);
 }
 
 PdfGen::~PdfGen() {
@@ -140,7 +140,10 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
         painter->TextState.SetFont(*font, stod(args["font_size"]));
         painter->GraphicsState.SetFillColor(PdfColor(0.0,0.0,0.0));
         string text = string(reinterpret_cast<char *>(node->content));
-
+        text.erase(std::remove(text.begin(), text.end(), '\n'), text.end());
+        if (std::all_of(text.begin(), text.end(), [](unsigned char c) {return c == ' ' || c == '\t';})) {
+            return array<double, 6>{pos[2], pos[3], 0.0, 0.0, pos[2], pos[3]};
+        }
         int last_space = 0, last_break = 0, substr_coord_x = max(pos[2], pos[6]), lines = 0;
         for (int i=0; i<text.length(); i++) {
             if (text[i] == ' ') {
