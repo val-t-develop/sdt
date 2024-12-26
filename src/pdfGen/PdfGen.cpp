@@ -123,7 +123,15 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 return array<double,6>{pos[2], pos[3], child_pos[4]+child_pos[0]-pos[2], child_pos[5]+child_pos[1]-pos[3], 0, child_pos[5]+child_pos[1]};
             }
             // TODO img, vid
-            return array<double,6>{0.0,0.0,0.0,0.0,0.0,0.0};
+            array<double, 8> child_pos{pos[4], pos[5], 0.0, 0.0, 0.0, 0.0, pos[6]-pos[4], pos[7]-pos[4]};
+            for (xmlNode *el = node->children; el; el = el->next) {
+                auto t = genNode(el, new_args, child_pos);
+                child_pos[2] = t[4];
+                child_pos[3] = t[5];
+                child_pos[4] = t[2]+t[0];
+                child_pos[5] = t[3]+t[1];
+            }
+            return array<double,6>{pos[2], pos[3], child_pos[4]+child_pos[0]-pos[2], child_pos[5]+child_pos[1]-pos[3], 0, child_pos[5]+child_pos[1]};
         } else {
             node->name = reinterpret_cast<const xmlChar *>(obj.base.c_str());
             return genNode(node, new_args, pos);
