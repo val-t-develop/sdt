@@ -42,35 +42,61 @@ void ConfReader::parse() {
                     string name = node.key();
                     if (node.value().is_object()) {
                         auto params = node.value().as_object();
-                        if (params.contains("base")) {
-                            auto base_v = params["base"];
-                            if (!base_v.is_string()) {
-                                Out::errorMessage("Argument 'base' for node " + name + " is not string");
-                            }
-                            PdfGen::Obj obj{};
-                            obj.base=base_v.as_string();
-
-                            if (params.contains("font")) {
-                                auto font_v = params["font"];
-                                if (!font_v.is_string()) {
+                        PdfGen::Obj obj{};
+                        for (auto param : params) {
+                            string pname = param.key();
+                            auto pval = param.value();
+                            if (pname == "base") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'base' for node " + name + " is not string");
+                                }
+                                obj.base = pval.as_string();
+                            } else if (pname == "font") {
+                                if (!pval.is_string()) {
                                     Out::errorMessage("Argument 'font' for node " + name + " is not string");
                                 }
-                                obj.args["font"] = string(font_v.as_string().c_str());
-                            }
-                            if (params.contains("font_size")) {
-                                auto font_size_v = params["font_size"];
-                                if (font_size_v.is_double()) {
-                                    obj.args["font_size"] = std::to_string(font_size_v.as_double());
-                                } else if (font_size_v.is_int64()) {
-                                    obj.args["font_size"] = std::to_string(font_size_v.as_int64());
+                                obj.args["font"] = string(pval.as_string().c_str());
+                            } else if (pname == "font_size") {
+                                if (pval.is_double()) {
+                                    obj.args["font_size"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["font_size"] = std::to_string(pval.as_int64());
                                 } else {
                                     Out::errorMessage("Argument 'font_size' for node " + name + " is not numeric");
                                 }
+                            } else if (pname == "doc_margin_x") {
+                                if (name!="doc") {
+                                    Out::errorMessage("Argument 'doc_margin_x' can be applied only for 'doc' node");
+                                }
+                                if (pval.is_double()) {
+                                    obj.args["doc_margin_x"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["doc_margin_x"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'doc_margin_x' is not numeric");
+                                }
+                            } else if (pname == "doc_margin_y") {
+                                if (name!="doc") {
+                                    Out::errorMessage("Argument 'doc_margin_y' can be applied only for 'doc' node");
+                                }
+                                if (pval.is_double()) {
+                                    obj.args["doc_margin_y"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["doc_margin_y"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'doc_margin_y' is not numeric");
+                                }
+                            } else if (pname == "src") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'src' for node " + name + " is not string");
+                                }
+                                obj.args["src"] = string(pval.as_string().c_str());
+                            }// TODO color, bgcolor
+                            else {
+                                Out::errorMessage("WARNING: argument '" + name + "' is not known and will be ignored");
                             }
-                            PdfGen::objs[name]=obj;
-                        } else {
-                            Out::errorMessage("Can not find 'base' for node " + name);
                         }
+                        PdfGen::objs[name]=obj;
                     }
                 }
             }
