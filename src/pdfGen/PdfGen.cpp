@@ -50,6 +50,7 @@ void PdfGen::gen() {
         root_args["font_size"] = "14";
         root_args["doc_margin_x"] = "50";
         root_args["doc_margin_y"] = "50";
+        root_args["src"] = ArgsParser::src->getName()+".png";
         array<double, 8> child_pos{0.0,0.0,0.0,0.0,0.0,0.0,stod(root_args["doc_margin_x"]),page->GetRect().Width-stod(root_args["doc_margin_x"])};
         for (xmlNode *node = root->children; node; node = node->next) {
             auto t = genNode(node, root_args, child_pos);
@@ -92,7 +93,6 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
 
         if (obj.base == "") {
             if (string(reinterpret_cast<const char*>(node->name))=="__rect") {
-
                 PdfPage* new_page = &(document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
                 painter->SetCanvas(*new_page);
                 array<double, 8> child_pos{pos[4], pos[5], 0.0, 0.0, 0.0, 0.0, pos[6]-pos[4], pos[7]-pos[4]};
@@ -121,8 +121,12 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                     child_pos[5] = t[3]+t[1];
                 }
                 return array<double,6>{pos[2], pos[3], child_pos[4]+child_pos[0]-pos[2], child_pos[5]+child_pos[1]-pos[3], 0, child_pos[5]+child_pos[1]};
+            } else if (string(reinterpret_cast<const char*>(node->name))=="img") {
+                auto img = document->CreateImage();
+                img->Load(args["src"]);
+                painter->DrawImage(*img, max(pos[4],pos[6])+pos[0],page->GetRect().Height-stod(args["doc_margin_y"])-pos[1]-pos[5]-img->GetHeight());
             }
-            // TODO img, vid
+            // TODO vid
             array<double, 8> child_pos{pos[4], pos[5], 0.0, 0.0, 0.0, 0.0, pos[6]-pos[4], pos[7]-pos[4]};
             for (xmlNode *el = node->children; el; el = el->next) {
                 auto t = genNode(el, new_args, child_pos);
