@@ -26,18 +26,21 @@
 #include <utils/ArgsParser.hpp>
 #include <utils/Out.hpp>
 
-int main(int argc, char **argv) { Main::main(argc, argv); return 0; }
+int main(int argc, char **argv) {
+    Main::main(argc, argv);
+    return 0;
+}
 
 void Main::main(int argc, char **argv) {
     ArgsParser::parseArgs(argc, argv);
     if (ArgsParser::src->isFile()) {
-        if (ArgsParser::conf!=nullptr) {
+        if (ArgsParser::conf != nullptr) {
             ConfReader conf_reader;
             conf_reader.parse();
         }
         PdfGen pdf_gen{};
         pdf_gen.gen();
-    } else  {
+    } else {
         Out::errorMessage("Processing directories is unsupported");
     }
 }

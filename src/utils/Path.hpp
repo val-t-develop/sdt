@@ -25,23 +25,23 @@
 #include <Defs.hpp>
 
 class Path {
-  fs::path path;
-  string content;
+    fs::path path;
+    string content;
 
-public:
-  Path();
-  Path(string name);
-  Path(fs::path &path);
+  public:
+    Path();
+    Path(string name);
+    Path(fs::path &path);
 
-  string getName() const;
-  string getFilename();
-  string readFile();
-  bool isFile();
-  bool isDir();
-  vector<Path> getDirContent();
-  Path getParent();
-  static Path getCurrentDir();
-  bool operator<(const Path &) const;
-  bool operator>(const Path &) const;
-  bool operator==(const Path &) const;
+    string getName() const;
+    string getFilename();
+    string readFile();
+    bool isFile();
+    bool isDir();
+    vector<Path> getDirContent();
+    Path getParent();
+    static Path getCurrentDir();
+    bool operator<(const Path &) const;
+    bool operator>(const Path &) const;
+    bool operator==(const Path &) const;
 };

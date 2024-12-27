@@ -52,8 +52,7 @@ string Path::readFile() {
             return "";
         }
 
-        content = string{std::istreambuf_iterator<char>(file),
-                         std::istreambuf_iterator<char>()};
+        content = string{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
 
         file.close();
 

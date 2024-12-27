@@ -24,6 +24,6 @@
 #pragma once
 
 class Main {
-public:
-    static void main(int argc, char** argv);
+  public:
+    static void main(int argc, char **argv);
 };

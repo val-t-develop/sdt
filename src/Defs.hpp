@@ -22,6 +22,7 @@
  */
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <exception>
 #include <filesystem>
@@ -33,8 +34,8 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <array>
 
+using std::array;
 using std::cerr;
 using std::cout;
 using std::endl;
@@ -45,16 +46,15 @@ using std::shared_ptr;
 using std::string;
 using std::unique_ptr;
 using std::vector;
-using std::array;
 namespace fs = std::filesystem;
 using std::exception;
 using std::fstream;
 using std::ifstream;
 using std::map;
-using std::ofstream;
-using std::stack;
 using std::max;
 using std::min;
+using std::ofstream;
+using std::stack;
 
 vector<string> split(string s, string delimiter);
 int64_t power(int base, int exponent);

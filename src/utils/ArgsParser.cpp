@@ -21,14 +21,14 @@
  *  Parser of arguments.
  */
 #include "ArgsParser.hpp"
-#include <utils/Out.hpp>
 #include <utils/License.hpp>
+#include <utils/Out.hpp>
 
 shared_ptr<Path> ArgsParser::output = nullptr;
 shared_ptr<Path> ArgsParser::conf = nullptr;
 shared_ptr<Path> ArgsParser::src = nullptr;
 
-void ArgsParser::parseArgs(int argc, char** argv) {
+void ArgsParser::parseArgs(int argc, char **argv) {
     string home = getenv("HOME");
     if (home.size() != 1 && (home.ends_with('/') || home.ends_with('\\'))) {
         home.pop_back();
@@ -49,18 +49,18 @@ void ArgsParser::parseArgs(int argc, char** argv) {
 void ArgsParser::parseArgs(vector<string> args) {
     for (size_t i = 1; i < args.size(); i++) {
         string arg = args[i];
-        if (arg=="-o") {
+        if (arg == "-o") {
             i++;
             arg = args[i];
             output = make_shared<Path>(arg);
-        } else if (arg=="-c") {
+        } else if (arg == "-c") {
             i++;
             arg = args[i];
             conf = make_shared<Path>(arg);
-        } else if (arg=="show") {
+        } else if (arg == "show") {
             i++;
             arg = args[i];
-            if (arg=="c" || arg=="w") {
+            if (arg == "c" || arg == "w") {
                 Out::printMessage(LICENSE);
             }
         } else {

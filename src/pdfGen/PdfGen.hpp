@@ -28,30 +28,32 @@
 using namespace PoDoFo;
 
 class PdfGen {
-public:
+  public:
     class Obj {
-    public:
+      public:
         string base;
-        map<string,string> args;
+        map<string, string> args;
     };
     static map<string, Obj> objs;
 
     xmlDoc *xml_document;
 
-    vector<PdfFont*> fonts;
-    PdfMemDocument* document;
-    PdfPainter* painter;
-    PdfPage* page;
+    vector<PdfFont *> fonts;
+    PdfMemDocument *document;
+    PdfPainter *painter;
+    PdfPage *page;
 
     PdfGen();
     ~PdfGen();
     void gen();
 
-    /*
+    /**
      *  coord - {coordinates origin, coordinates that you should try to use first, coordinates, max_left, max_right}
-     *  returns {coordinates that have been used, size, coordinates that you should try to use first when rendering next object}
+     *
+     *  returns {coordinates that have been used, size, coordinates that you should try to use first when rendering next
+     * object}
      */
-    array<double,6> genNode(xmlNode* node, map<string,string>& args, array<double,8> pos);
-    void genAttr(xmlAttr* attr, map<string,string>& args);
-    array<double,3> genColor(string str);
+    array<double, 6> genNode(xmlNode *node, map<string, string> &args, array<double, 8> pos);
+    void genAttr(xmlAttr *attr, map<string, string> &args);
+    array<double, 3> genColor(string str);
 };

@@ -24,7 +24,7 @@
 #include <boost/json.hpp>
 
 class ConfReader {
-public:
+  public:
     boost::json::object conf;
     ConfReader();
     void parse();

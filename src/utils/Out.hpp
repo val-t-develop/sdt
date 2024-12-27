@@ -25,7 +25,7 @@
 #include <Defs.hpp>
 
 class Out {
-public:
+  public:
     static int messages;
 
     static void errorMessage(string msg);

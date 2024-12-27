@@ -21,7 +21,6 @@
  *  Some definitions used in project.
  */
 #include "Defs.hpp"
-#include "Defs.hpp"
 
 vector<string> split(string s, string delimiter) {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
@@ -40,7 +39,7 @@ vector<string> split(string s, string delimiter) {
 int64_t power(int base, int exponent) {
     int64_t result = 1;
     for (int i = 0; i < exponent; ++i) {
-        result*=base;
+        result *= base;
     }
     return result;
 }

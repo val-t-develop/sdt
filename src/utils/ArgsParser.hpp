@@ -1,5 +1,5 @@
 /*  SDT - Scientific Document Tool
-*  Copyright (C) 2022-2024  Valentyn Tymchyshyn
+ *  Copyright (C) 2022-2024  Valentyn Tymchyshyn
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,11 +26,11 @@
 #include <utils/Path.hpp>
 
 class ArgsParser {
-public:
+  public:
     static shared_ptr<Path> output;
     static shared_ptr<Path> conf;
     static shared_ptr<Path> src;
 
-    static void parseArgs(int argc, char** argv);
+    static void parseArgs(int argc, char **argv);
     static void parseArgs(vector<string> args);
 };
