@@ -52,4 +52,5 @@ public:
      *  returns {coordinates that have been used, size, coordinates that you should try to use first when rendering next object}
      */
     array<double,6> genNode(xmlNode* node, map<string,string>& args, array<double,8> pos);
+    void genAttr(xmlAttr* attr, map<string,string>& args);
 };
