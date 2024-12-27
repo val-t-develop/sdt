@@ -41,7 +41,7 @@ class PdfGen {
     vector<PdfFont *> fonts;
     PdfMemDocument *document;
     PdfPainter *painter;
-    PdfPage *page;
+    stack<PdfPage*> pages;
 
     PdfGen();
     ~PdfGen();
