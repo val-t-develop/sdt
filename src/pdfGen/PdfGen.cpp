@@ -25,17 +25,17 @@
 #include <utils/ArgsParser.hpp>
 #include <utils/Out.hpp>
 
-map<string, PdfGen::Obj> PdfGen::objs = map<string, PdfGen::Obj>();
+map<string, PdfGen::Obj> PdfGen::objs = map<string, Obj>();
 
 PdfGen::PdfGen() {
     xmlInitParser();
-    xml_document = xmlReadFile(ArgsParser::src->getName().c_str(), NULL, XML_PARSE_NOBLANKS);
+    xml_document = xmlReadFile(ArgsParser::src->getName().c_str(), nullptr, XML_PARSE_NOBLANKS);
 }
 
 PdfGen::~PdfGen() { xmlCleanupParser(); }
 
 void PdfGen::gen() {
-    xmlNode *root = xmlDocGetRootElement(xml_document);
+    const xmlNode *root = xmlDocGetRootElement(xml_document);
     document = new PdfMemDocument();
     painter = new PdfPainter();
 
@@ -43,7 +43,7 @@ void PdfGen::gen() {
         pages.push(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
         painter->SetCanvas(*pages.top());
 
-        map<string, string> root_args = map<string, string>();
+        map<string, string> root_args{};
         root_args["font"] = "Noto Sans";
         root_args["font_size"] = "14";
         root_args["color"] = "000000";
@@ -79,18 +79,17 @@ void PdfGen::gen() {
         painter->FinishDrawing();
 
         // TODO
-        document->GetMetadata().SetCreator(PdfString("SDT - Scientific Document Tool (powered by PoDoFo)"));
+        document->GetMetadata().SetCreator(PdfString("SDT - Scientific Document Tool (powered by PoDoFo, libxml2, boost)"));
         document->GetMetadata().SetAuthor(PdfString(""));
         document->GetMetadata().SetTitle(PdfString(""));
         document->GetMetadata().SetSubject(PdfString(""));
         document->GetMetadata().SetKeywords(vector<string>({""}));
 
         document->Save(ArgsParser::output->getName());
-    } catch (PdfError &e) {
+    } catch (PdfError& e) {
         try {
             painter->FinishDrawing();
-        } catch (...) {
-        }
+        } catch (...) {}
         throw e;
     }
 
@@ -101,7 +100,7 @@ void PdfGen::gen() {
 array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array<double, 8> pos) {
     if (node->type == XML_ELEMENT_NODE) {
         Obj obj = objs[string(reinterpret_cast<const char *>(node->name))];
-        map<string, string> new_args = map<string, string>(args);
+        map new_args(args);
         for (auto el : obj.args) {
             new_args[el.first] = el.second;
         }
@@ -192,8 +191,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
         painter->TextState.SetFont(*font, stod(args["font_size"]));
         auto col = genColor(args["color"]);
         painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
-        string text = string(reinterpret_cast<char *>(node->content));
-        text.erase(std::remove(text.begin(), text.end(), '\n'), text.end());
+        string text(reinterpret_cast<char *>(node->content));
+        text.erase(std::ranges::remove(text, '\n').begin(), text.end());
         boost::trim(text);
         if (text.empty()) {
             return array<double, 6>{pos[2], pos[3], 0.0, 0.0, pos[2], pos[3]};
@@ -236,13 +235,10 @@ void PdfGen::genAttr(xmlAttr *attr, map<string, string> &args) {
         string(reinterpret_cast<char *>(attr->children->content));
 }
 
-array<double, 3> PdfGen::genColor(string str) {
+array<double, 3> PdfGen::genColor(const string &str) {
     unsigned int red, green, blue;
     std::istringstream(str.substr(0, 2)) >> std::hex >> red;
     std::istringstream(str.substr(2, 2)) >> std::hex >> green;
     std::istringstream(str.substr(4, 2)) >> std::hex >> blue;
-    double r = red / 255.0;
-    double g = green / 255.0;
-    double b = blue / 255.0;
-    return array<double, 3>{r, g, b};
+    return array<double, 3>{red/255.0, green/255.0, blue/255.0};
 }

@@ -34,10 +34,10 @@ ConfReader::ConfReader() {
 }
 
 void ConfReader::parse() {
-    for (auto param : conf) {
-        if (param.key() == "nodes") {
-            if (param.value().is_object()) {
-                auto nodes = param.value().as_object();
+    for (auto arg : conf) {
+        if (arg.key() == "nodes") {
+            if (arg.value().is_object()) {
+                auto nodes = arg.value().as_object();
                 for (auto node : nodes) {
                     string name = node.key();
                     if (node.value().is_object()) {
