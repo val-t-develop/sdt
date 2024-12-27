@@ -53,4 +53,5 @@ public:
      */
     array<double,6> genNode(xmlNode* node, map<string,string>& args, array<double,8> pos);
     void genAttr(xmlAttr* attr, map<string,string>& args);
+    array<double,3> genColor(string str);
 };

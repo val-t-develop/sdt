@@ -49,6 +49,8 @@ void PdfGen::gen() {
         map<string, string> root_args = map<string, string>();
         root_args["font"] = "Noto Sans";
         root_args["font_size"] = "14";
+        root_args["color"] = "000000";
+        root_args["bgcolor"] = "FF0000";
         root_args["doc_margin_x"] = "50";
         root_args["doc_margin_y"] = "50";
         root_args["src"] = ArgsParser::src->getName()+".png";
@@ -123,8 +125,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args,
                 }
                 document->GetPages().RemovePageAt(new_page->GetIndex());
                 painter->SetCanvas(*page);
-                painter->GraphicsState.SetFillColor(PdfColor(1.0, 0.0, 0.0));
-                painter->GraphicsState.SetStrokeColor(PdfColor(0.0, 1.0, 0.0));
+                auto col = genColor(args["bgcolor"]);
+                painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
                 painter->DrawRectangle(max(pos[4], pos[6]) + pos[0],
                                        page->GetRect().Height -
                                            stod(args["doc_margin_y"]) -
@@ -190,7 +192,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args,
             throw std::runtime_error("Invalid handle");
 
         painter->TextState.SetFont(*font, stod(args["font_size"]));
-        painter->GraphicsState.SetFillColor(PdfColor(0.0, 0.0, 0.0));
+        auto col = genColor(args["color"]);
+        painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
         string text = string(reinterpret_cast<char *>(node->content));
         text.erase(std::remove(text.begin(), text.end(), '\n'), text.end());
         boost::trim(text);
@@ -245,4 +248,15 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args,
 }
 void PdfGen::genAttr(xmlAttr* attr, map<string, string> &args) {
     args[string(reinterpret_cast<const char *>(attr->name))] = string(reinterpret_cast<char *>(attr->children->content));
+}
+
+array<double, 3> PdfGen::genColor(string str) {
+    unsigned int red, green, blue;
+    std::istringstream(str.substr(0, 2)) >> std::hex >> red;
+    std::istringstream(str.substr(2, 2)) >> std::hex >> green;
+    std::istringstream(str.substr(4, 2)) >> std::hex >> blue;
+    double r = red / 255.0;
+    double g = green / 255.0;
+    double b = blue / 255.0;
+    return array<double, 3>{r,g,b};
 }

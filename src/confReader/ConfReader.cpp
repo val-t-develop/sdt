@@ -91,8 +91,37 @@ void ConfReader::parse() {
                                     Out::errorMessage("Argument 'src' for node " + name + " is not string");
                                 }
                                 obj.args["src"] = string(pval.as_string().c_str());
-                            }// TODO color, bgcolor
-                            else {
+                            } else if (pname == "color") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'color' for node " + name + " is not string");
+                                }
+                                string color(pval.as_string());
+                                if (color.size()!=6) {
+                                    Out::errorMessage("Argument 'color' for node " + name + " is not 6 character string");
+                                }
+                                for (auto c : color) {
+                                    if (c!='0' && c!='1' && c!='2' && c!='3' && c!='4' && c!='5' && c!='6' && c!='7' && c!='8' && c!='9' &&
+                                        c!='A' && c!='B' && c!='C' && c!='D' && c!='E' && c!='F') {
+                                        Out::errorMessage("Argument 'color' for node " + name + " can not contain '"+c+"' character");
+                                    }
+                                }
+                                obj.args["color"] = color;
+                            } else if (pname == "bgcolor") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'bgcolor' for node " + name + " is not string");
+                                }
+                                string bgcolor(pval.as_string());
+                                if (bgcolor.size()!=6) {
+                                    Out::errorMessage("Argument 'bgcolor' for node " + name + " is not 6 character string");
+                                }
+                                for (auto c : bgcolor) {
+                                    if (c!='0' && c!='1' && c!='2' && c!='3' && c!='4' && c!='5' && c!='6' && c!='7' && c!='8' && c!='9' &&
+                                        c!='A' && c!='B' && c!='C' && c!='D' && c!='E' && c!='F') {
+                                        Out::errorMessage("Argument 'bgcolor' for node " + name + " can not contain '"+c+"' character");
+                                        }
+                                }
+                                obj.args["bgcolor"] = bgcolor;
+                            } else {
                                 Out::errorMessage("WARNING: argument '" + name + "' is not known and will be ignored");
                             }
                         }
