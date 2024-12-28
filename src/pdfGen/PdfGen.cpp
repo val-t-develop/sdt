@@ -50,6 +50,14 @@ void PdfGen::gen() {
         root_args["bgcolor"] = "FF0000";
         root_args["doc_margin_x"] = "50";
         root_args["doc_margin_y"] = "50";
+        root_args["margin_left"] = "0";
+        root_args["margin_right"] = "0";
+        root_args["margin_top"] = "0";
+        root_args["margin_bottom"] = "0";
+        root_args["padding_left"] = "0";
+        root_args["padding_right"] = "0";
+        root_args["padding_top"] = "0";
+        root_args["padding_bottom"] = "0";
         root_args["src"] = ArgsParser::src->getName() + ".png";
 
         Obj obj = objs[string(reinterpret_cast<const char *>(root->name))];
@@ -113,9 +121,24 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 for (auto attr = new_node->properties; attr; attr = attr->next) {
                     genAttr(attr, new_args);
                 }
-                array<double, 8> child_pos{pos[4]+pos[0], pos[5]+pos[1], 0.0, 0.0, 0.0, 0.0, pos[6] - pos[4], pos[7] - pos[4]};
+                double ml = stod(args["margin_left"]), mr = stod(args["margin_right"]),
+                    mt = stod(args["margin_top"]), mb = stod(args["margin_bottom"]),
+                    pl = stod(args["padding_left"]), pr = stod(args["padding_right"]),
+                    pt = stod(args["padding_top"]), pb = stod(args["padding_bottom"]);
+                array<double, 8> child_pos{pos[4]+pos[0]+ml+pl,
+                    pos[5]+pos[1]+mt+pt,
+                    0.0, 0.0, 0.0, 0.0,
+                    pos[6] - pos[4],
+                    pos[7] - pos[4]-ml-pl-mr-pr};
                 double max_x = child_pos[4];
-
+                args["margin_left"] = "0";
+                args["margin_right"] = "0";
+                args["margin_top"] = "0";
+                args["margin_bottom"] = "0";
+                args["padding_left"] = "0";
+                args["padding_right"] = "0";
+                args["padding_top"] = "0";
+                args["padding_bottom"] = "0";
                 for (xmlNode *el = new_node->children; el; el = el->next) {
                     auto t = genNode(el, new_args, child_pos);
                     child_pos[2] = t[4];
@@ -127,14 +150,27 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 document->GetPages().RemovePageAt(pages.top()->GetIndex());
                 pages.pop();
                 painter->SetCanvas(*pages.top());
-                drawRect(max(pos[4], pos[6])+pos[0], pos[5]+pos[1],
-                    max_x - pos[4], child_pos[5] + child_pos[1] - pos[5] - pos[1],
+                drawRect(max(pos[4], pos[6])+pos[0]+ml, pos[5]+pos[1]+mt,
+                    max_x-pos[4]+pl+pr, child_pos[5]+child_pos[1]-pos[5]-pos[1]-mt+pb,
                     args["bgcolor"], "fill");
                 for (auto attr = node->properties; attr; attr = attr->next) {
                     genAttr(attr, new_args);
                 }
-                child_pos = array<double, 8>{pos[4]+pos[0], pos[5]+pos[1], 0.0, 0.0, 0.0, 0.0, pos[6] - pos[4], pos[7] - pos[4]};
+                child_pos = array<double, 8>{pos[4]+pos[0]+ml+pl,
+                    pos[5]+pos[1]+mt+pt,
+                    0.0, 0.0, 0.0, 0.0,
+                    pos[6] - pos[4],
+                    pos[7] - pos[4]-ml-pl-mr-pr};
+
                 max_x = child_pos[4];
+                args["margin_left"] = "0";
+                args["margin_right"] = "0";
+                args["margin_top"] = "0";
+                args["margin_bottom"] = "0";
+                args["padding_left"] = "0";
+                args["padding_right"] = "0";
+                args["padding_top"] = "0";
+                args["padding_bottom"] = "0";
                 for (xmlNode *el = node->children; el; el = el->next) {
                     auto t = genNode(el, new_args, child_pos);
                     child_pos[2] = t[4];
@@ -145,10 +181,10 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 }
                 return array<double, 6>{max(pos[4], pos[6]),
                                         pos[5],
-                                        max_x - pos[4],
-                                        child_pos[5] + child_pos[1] - pos[5] - pos[1],
+                                        max_x - pos[4]+ml+mr+pr+pl,
+                                        child_pos[5] + child_pos[1] - pos[5] - pos[1]+mt+mb+pt+pb,
                                         0,
-                                        child_pos[5]+pos[5]};
+                                        child_pos[5]+pos[5]+mt+mb+pt+pb};
             } else if (string(reinterpret_cast<const char *>(node->name)) == "img") {
                 auto img = document->CreateImage();
                 img->Load(args["src"]);
