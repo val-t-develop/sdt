@@ -61,7 +61,7 @@ void PdfGen::gen() {
             genAttr(attr, root_args);
         }
         array<double, 8> child_pos{stod(root_args["doc_margin_x"]),
-                                   0.0,
+                                   stod(root_args["doc_margin_y"]),
                                    0.0,
                                    0.0,
                                    0.0,
@@ -127,8 +127,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 document->GetPages().RemovePageAt(pages.top()->GetIndex());
                 pages.pop();
                 painter->SetCanvas(*pages.top());
-                drawRect(max(pos[4], pos[6])+pos[0], pos[5]+pos[1]+stod(args["doc_margin_y"]),
-                    max_x - pos[4], child_pos[5] - pos[5],
+                drawRect(max(pos[4], pos[6])+pos[0], pos[5]+pos[1],
+                    max_x - pos[4], child_pos[5] + child_pos[1] - pos[5] - pos[1],
                     args["bgcolor"], "fill");
                 for (auto attr = node->properties; attr; attr = attr->next) {
                     genAttr(attr, new_args);
@@ -145,15 +145,15 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 }
                 return array<double, 6>{max(pos[4], pos[6]),
                                         pos[5],
-                                        max_x + child_pos[0] - pos[2],
-                                        child_pos[5] + child_pos[1] - pos[3],
+                                        max_x - pos[4],
+                                        child_pos[5] + child_pos[1] - pos[5] - pos[1],
                                         0,
-                                        child_pos[5] + child_pos[1]};
+                                        child_pos[5]+pos[5]};
             } else if (string(reinterpret_cast<const char *>(node->name)) == "img") {
                 auto img = document->CreateImage();
                 img->Load(args["src"]);
                 painter->DrawImage(*img, max(pos[4], pos[6]) + pos[0],
-                                   pages.top()->GetRect().Height - stod(args["doc_margin_y"]) - pos[1] - pos[5] -
+                                   pages.top()->GetRect().Height - pos[1] - pos[5] -
                                        img->GetHeight());
             }
             // TODO vid
@@ -202,7 +202,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                     string s = text.substr(last_break, last_space - last_break + 1);
                     painter->DrawText(s, pos[0] + substr_coord_x,
                                       pages.top()->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) -
-                                          pos[3] - pos[1] - stod(args["doc_margin_y"]) - stod(args["font_size"]));
+                                          pos[3] - pos[1] - stod(args["font_size"]));
                     last_break = last_space + 1;
                     substr_coord_x = pos[6];
                     lines++;
@@ -212,7 +212,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
         }
         painter->DrawText(text.substr(last_break, text.length()), pos[0] + substr_coord_x,
                           pages.top()->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) - pos[1] -
-                              pos[3] - stod(args["doc_margin_y"]) - stod(args["font_size"]));
+                              pos[3] - stod(args["font_size"]));
         lines++;
         return array<double, 6>{pos[2],
                                 pos[3],
@@ -221,7 +221,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                                 font->GetStringLength(text.substr(last_break, text.length()), painter->TextState) +
                                     substr_coord_x,
                                 pages.top()->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) -
-                                    pos[3] - stod(args["doc_margin_y"]) - stod(args["font_size"])};
+                                    pos[3] - stod(args["font_size"])};
     } else {
         Out::errorMessage("Unsupported xml node type");
         return array<double, 6>{-1, -1, -1, -1, -1, -1};
