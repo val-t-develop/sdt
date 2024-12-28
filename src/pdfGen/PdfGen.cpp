@@ -60,14 +60,14 @@ void PdfGen::gen() {
         for (auto attr = root->properties; attr; attr = attr->next) {
             genAttr(attr, root_args);
         }
-        array<double, 8> child_pos{0.0,
+        array<double, 8> child_pos{stod(root_args["doc_margin_x"]),
                                    0.0,
                                    0.0,
                                    0.0,
                                    0.0,
                                    0.0,
-                                   stod(root_args["doc_margin_x"]),
-                                   pages.top()->GetRect().Width - stod(root_args["doc_margin_x"])};
+                                   0.0,
+                                   pages.top()->GetRect().Width - 2*stod(root_args["doc_margin_x"])};
         for (xmlNode *node = root->children; node; node = node->next) {
             auto t = genNode(node, root_args, child_pos);
             child_pos[2] = t[4];
@@ -113,7 +113,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 for (auto attr = new_node->properties; attr; attr = attr->next) {
                     genAttr(attr, new_args);
                 }
-                array<double, 8> child_pos{pos[4], pos[5], 0.0, 0.0, 0.0, 0.0, pos[6] - pos[4], pos[7] - pos[4]};
+                array<double, 8> child_pos{pos[4]+pos[0], pos[5]+pos[1], 0.0, 0.0, 0.0, 0.0, pos[6] - pos[4], pos[7] - pos[4]};
                 double max_x = child_pos[4];
 
                 for (xmlNode *el = new_node->children; el; el = el->next) {
@@ -127,16 +127,13 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 document->GetPages().RemovePageAt(pages.top()->GetIndex());
                 pages.pop();
                 painter->SetCanvas(*pages.top());
-                auto col = genColor(args["bgcolor"]);
-                painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
-                painter->DrawRectangle(
-                    max(pos[4], pos[6]) + pos[0],
-                    pages.top()->GetRect().Height - stod(args["doc_margin_y"]) - child_pos[5] - child_pos[1],
-                    max_x + child_pos[0] - pos[4], child_pos[5] + child_pos[1] - pos[5], PdfPathDrawMode::Fill);
+                drawRect(max(pos[4], pos[6])+pos[0], pos[5]+pos[1]+stod(args["doc_margin_y"]),
+                    max_x - pos[4], child_pos[5] - pos[5],
+                    args["bgcolor"], "fill");
                 for (auto attr = node->properties; attr; attr = attr->next) {
                     genAttr(attr, new_args);
                 }
-                child_pos = array<double, 8>{pos[4], pos[5], 0.0, 0.0, 0.0, 0.0, pos[6] - pos[4], pos[7] - pos[4]};
+                child_pos = array<double, 8>{pos[4]+pos[0], pos[5]+pos[1], 0.0, 0.0, 0.0, 0.0, pos[6] - pos[4], pos[7] - pos[4]};
                 max_x = child_pos[4];
                 for (xmlNode *el = node->children; el; el = el->next) {
                     auto t = genNode(el, new_args, child_pos);
@@ -146,8 +143,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                     child_pos[4] = 0;
                     child_pos[5] = t[3] + t[1];
                 }
-                return array<double, 6>{pos[2],
-                                        pos[3],
+                return array<double, 6>{max(pos[4], pos[6]),
+                                        pos[5],
                                         max_x + child_pos[0] - pos[2],
                                         child_pos[5] + child_pos[1] - pos[3],
                                         0,
@@ -214,8 +211,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
             }
         }
         painter->DrawText(text.substr(last_break, text.length()), pos[0] + substr_coord_x,
-                          pages.top()->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) - pos[1] - pos[3] -
-                              stod(args["doc_margin_y"]) - stod(args["font_size"]));
+                          pages.top()->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) - pos[1] -
+                              pos[3] - stod(args["doc_margin_y"]) - stod(args["font_size"]));
         lines++;
         return array<double, 6>{pos[2],
                                 pos[3],
@@ -223,13 +220,28 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                                 lines * font->GetLineSpacing(painter->TextState),
                                 font->GetStringLength(text.substr(last_break, text.length()), painter->TextState) +
                                     substr_coord_x,
-                                pages.top()->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) - pos[3] -
-                                    stod(args["doc_margin_y"]) - stod(args["font_size"])};
+                                pages.top()->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) -
+                                    pos[3] - stod(args["doc_margin_y"]) - stod(args["font_size"])};
     } else {
         Out::errorMessage("Unsupported xml node type");
         return array<double, 6>{-1, -1, -1, -1, -1, -1};
     }
 }
+
+void PdfGen::drawRect(double x, double y, double w, double h, string color, string mode = "fill") {
+    auto col = genColor(color);
+    PdfPathDrawMode m;
+    if (mode == "fill") {
+        m = PdfPathDrawMode::Fill;
+    } else if (mode == "stroke") {
+        m = PdfPathDrawMode::Stroke;
+    } else {
+        Out::errorMessage("Rectangle draw mode is unknown");
+    }
+    painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
+    painter->DrawRectangle(x, pages.top()->GetRect().Height-y-h, w, h, m);
+}
+
 void PdfGen::genAttr(xmlAttr *attr, map<string, string> &args) {
     args[string(reinterpret_cast<const char *>(attr->name))] =
         string(reinterpret_cast<char *>(attr->children->content));
