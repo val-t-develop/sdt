@@ -160,7 +160,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
             for (auto attr = node->properties; attr; attr = attr->next) {
                 genAttr(attr, new_args);
             }
-            array<double, 8> child_pos{pos[4], pos[5], 0.0, 0.0, 0.0, 0.0, pos[6] - pos[4], pos[7] - pos[4]};
+            array<double, 8> child_pos{pos[4] + pos[0], pos[5] + pos[1], 0.0, 0.0, 0.0, 0.0, pos[6] - pos[4], pos[7] - pos[4]};
             double max_x = child_pos[4];
             for (xmlNode *el = node->children; el; el = el->next) {
                 auto t = genNode(el, new_args, child_pos);
@@ -170,12 +170,12 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 child_pos[4] = 0;
                 child_pos[5] = t[3] + t[1];
             }
-            return array<double, 6>{pos[2],
-                                    pos[3],
-                                    child_pos[4] + child_pos[0] - pos[2],
-                                    child_pos[5] + child_pos[1] - pos[3],
+            return array<double, 6>{max(pos[4], pos[6]),
+                                    pos[5],
+                                    max_x - pos[4],
+                                    child_pos[5] + child_pos[1] - pos[5] - pos[1],
                                     0,
-                                    child_pos[5] + child_pos[1]};
+                                    child_pos[5]+pos[5]};
         } else {
             node->name = reinterpret_cast<const xmlChar *>(obj.base.c_str());
             return genNode(node, new_args, pos);
