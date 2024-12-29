@@ -121,24 +121,24 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 for (auto attr = new_node->properties; attr; attr = attr->next) {
                     genAttr(attr, new_args);
                 }
-                double ml = stod(args["margin_left"]), mr = stod(args["margin_right"]),
-                    mt = stod(args["margin_top"]), mb = stod(args["margin_bottom"]),
-                    pl = stod(args["padding_left"]), pr = stod(args["padding_right"]),
-                    pt = stod(args["padding_top"]), pb = stod(args["padding_bottom"]);
+                double ml = stod(new_args["margin_left"]), mr = stod(new_args["margin_right"]),
+                    mt = stod(new_args["margin_top"]), mb = stod(new_args["margin_bottom"]),
+                    pl = stod(new_args["padding_left"]), pr = stod(new_args["padding_right"]),
+                    pt = stod(new_args["padding_top"]), pb = stod(new_args["padding_bottom"]);
                 array<double, 8> child_pos{pos[4]+pos[0]+ml+pl,
                     pos[5]+pos[1]+mt+pt,
                     0.0, 0.0, 0.0, 0.0,
                     pos[6] - pos[4],
                     pos[7] - pos[4]-ml-pl-mr-pr};
                 double max_x = child_pos[4];
-                args["margin_left"] = "0";
-                args["margin_right"] = "0";
-                args["margin_top"] = "0";
-                args["margin_bottom"] = "0";
-                args["padding_left"] = "0";
-                args["padding_right"] = "0";
-                args["padding_top"] = "0";
-                args["padding_bottom"] = "0";
+                new_args["margin_left"] = "0";
+                new_args["margin_right"] = "0";
+                new_args["margin_top"] = "0";
+                new_args["margin_bottom"] = "0";
+                new_args["padding_left"] = "0";
+                new_args["padding_right"] = "0";
+                new_args["padding_top"] = "0";
+                new_args["padding_bottom"] = "0";
                 for (xmlNode *el = new_node->children; el; el = el->next) {
                     auto t = genNode(el, new_args, child_pos);
                     child_pos[2] = t[4];
@@ -163,14 +163,14 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                     pos[7] - pos[4]-ml-pl-mr-pr};
 
                 max_x = child_pos[4];
-                args["margin_left"] = "0";
-                args["margin_right"] = "0";
-                args["margin_top"] = "0";
-                args["margin_bottom"] = "0";
-                args["padding_left"] = "0";
-                args["padding_right"] = "0";
-                args["padding_top"] = "0";
-                args["padding_bottom"] = "0";
+                new_args["margin_left"] = "0";
+                new_args["margin_right"] = "0";
+                new_args["margin_top"] = "0";
+                new_args["margin_bottom"] = "0";
+                new_args["padding_left"] = "0";
+                new_args["padding_right"] = "0";
+                new_args["padding_top"] = "0";
+                new_args["padding_bottom"] = "0";
                 for (xmlNode *el = node->children; el; el = el->next) {
                     auto t = genNode(el, new_args, child_pos);
                     child_pos[2] = t[4];
@@ -279,8 +279,176 @@ void PdfGen::drawRect(double x, double y, double w, double h, string color, stri
 }
 
 void PdfGen::genAttr(xmlAttr *attr, map<string, string> &args) {
-    args[string(reinterpret_cast<const char *>(attr->name))] =
-        string(reinterpret_cast<char *>(attr->children->content));
+    string pname(reinterpret_cast<const char *>(attr->name));
+    string pval(reinterpret_cast<char *>(attr->children->content));
+    if (pname == "base") {
+        while (!pval.empty()) {
+            Obj obj = objs[pval];
+            for (auto el : obj.args) {
+                args[el.first] = el.second;
+            }
+            pname=obj.base;
+        }
+    } else if (pname == "font") {
+        args["font"] = pval;
+    } else if (pname == "font_size") {
+        try {
+            stod(pval);
+            args["font_size"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'font_size' is not numeric");
+        }
+    } else if (pname == "doc_margin_x") {
+        try {
+            stod(pval);
+            args["doc_margin_x"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'doc_margin_x' is not numeric");
+        }
+    } else if (pname == "doc_margin_y") {
+        try {
+            stod(pval);
+            args["doc_margin_y"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'doc_margin_y' is not numeric");
+        }
+    } else if (pname == "margin_left") {
+        try {
+            stod(pval);
+            args["margin_left"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'margin_left' is not numeric");
+        }
+    } else if (pname == "margin_right") {
+        try {
+            stod(pval);
+            args["margin_right"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'margin_right' is not numeric");
+        }
+    } else if (pname == "margin_top") {
+        try {
+            stod(pval);
+            args["margin_top"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'margin_top' is not numeric");
+        }
+    } else if (pname == "margin_bottom") {
+        try {
+            stod(pval);
+            args["margin_bottom"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'margin_bottom' is not numeric");
+        }
+    } else if (pname == "padding_left") {
+        try {
+            stod(pval);
+            args["padding_left"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'padding_left' is not numeric");
+        }
+    } else if (pname == "padding_right") {
+        try {
+            stod(pval);
+            args["padding_right"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'padding_right' is not numeric");
+        }
+    } else if (pname == "padding_top") {
+        try {
+            stod(pval);
+            args["padding_top"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'padding_top' is not numeric");
+        }
+    } else if (pname == "padding_bottom") {
+        try {
+            stod(pval);
+            args["padding_bottom"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'padding_bottom' is not numeric");
+        }
+    } else if (pname == "margin_x") {
+        try {
+            stod(pval);
+            args["margin_left"] = pval;
+            args["margin_right"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'margin_x' is not numeric");
+        }
+    } else if (pname == "margin_y") {
+        try {
+            stod(pval);
+            args["margin_top"] = pval;
+            args["margin_bottom"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'margin_y' is not numeric");
+        }
+    } else if (pname == "padding_x") {
+        try {
+            stod(pval);
+            args["padding_left"] = pval;
+            args["padding_right"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'padding_x' is not numeric");
+        }
+    } else if (pname == "padding_y") {
+        try {
+            stod(pval);
+            args["padding_top"] = pval;
+            args["padding_bottom"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'padding_y' is not numeric");
+        }
+    } else if (pname == "margin") {
+        try {
+            stod(pval);
+            args["margin_left"] = pval;
+            args["margin_right"] = pval;
+            args["margin_top"] = pval;
+            args["margin_bottom"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'margin' is not numeric");
+        }
+    } else if (pname == "padding") {
+        try {
+            stod(pval);
+            args["padding_left"] = pval;
+            args["padding_right"] = pval;
+            args["padding_top"] = pval;
+            args["padding_bottom"] = pval;
+        } catch (...) {
+            Out::errorMessage("Argument 'padding' is not numeric");
+        }
+    } else if (pname == "src") {
+        args["src"] = pval;
+    } else if (pname == "color") {
+        if (pval.size() != 6) {
+            Out::errorMessage("Argument 'color' is not 6 character string");
+        }
+        for (auto c : pval) {
+            if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
+                c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
+                c != 'C' && c != 'D' && c != 'E' && c != 'F') {
+                Out::errorMessage(string("Argument 'color' can not contain '") + c + "' character");
+            }
+        }
+        args["color"] = pval;
+    } else if (pname == "bgcolor") {
+        if (pval.size() != 6) {
+            Out::errorMessage("Argument 'bgcolor' is not 6 character string");
+        }
+        for (auto c : pval) {
+            if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
+                c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
+                c != 'C' && c != 'D' && c != 'E' && c != 'F') {
+                Out::errorMessage(string("Argument 'bgcolor' can not contain '") + c + "' character");
+            }
+        }
+        args["bgcolor"] = pval;
+    } else {
+        Out::errorMessage("WARNING: argument '" + pname + "' is not known and will be ignored");
+    }
 }
 
 array<double, 3> PdfGen::genColor(const string &str) {
