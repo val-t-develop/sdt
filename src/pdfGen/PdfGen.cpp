@@ -40,8 +40,9 @@ void PdfGen::gen() {
     painter = new PdfPainter();
 
     try {
-        pages.push(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
-        painter->SetCanvas(*pages.top());
+        pages.push_back(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
+        pages.push_back(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
+        painter->SetCanvas(*pages[pages.size()-1]);
 
         map<string, string> root_args{};
         root_args["font"] = "Noto Sans";
@@ -75,14 +76,15 @@ void PdfGen::gen() {
                                    0.0,
                                    0.0,
                                    0.0,
-                                   pages.top()->GetRect().Width - 2*stod(root_args["doc_margin_x"])};
+                                   pages[pages.size()-1]->GetRect().Width - 2*stod(root_args["doc_margin_x"])};
         for (xmlNode *node = root->children; node; node = node->next) {
-            auto t = genNode(node, root_args, child_pos);
+            auto t = genNode(node, root_args, child_pos, 1);
             child_pos[2] = t[4];
             child_pos[3] = t[5];
             child_pos[4] = 0;
             child_pos[5] = t[3] + t[1];
         }
+        document->GetPages().RemovePageAt(0);
 
         painter->FinishDrawing();
 
@@ -105,7 +107,7 @@ void PdfGen::gen() {
     delete document;
 }
 
-array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array<double, 8> pos) {
+array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array<double, 8> pos, int render) {
     if (node->type == XML_ELEMENT_NODE) {
         Obj obj = objs[string(reinterpret_cast<const char *>(node->name))];
         map new_args(args);
@@ -115,8 +117,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
 
         if (obj.base == "") {
             if (string(reinterpret_cast<const char *>(node->name)) == "__rect") {
-                pages.push(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
-                painter->SetCanvas(*pages.top());
+                painter->SetCanvas(*pages[0]);
                 auto new_node = xmlCopyNode(node, 1);
                 for (auto attr = new_node->properties; attr; attr = attr->next) {
                     genAttr(attr, new_args);
@@ -140,16 +141,14 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 new_args["padding_top"] = "0";
                 new_args["padding_bottom"] = "0";
                 for (xmlNode *el = new_node->children; el; el = el->next) {
-                    auto t = genNode(el, new_args, child_pos);
+                    auto t = genNode(el, new_args, child_pos, 0);
                     child_pos[2] = t[4];
                     child_pos[3] = t[5];
                     max_x = max(t[2] + t[0], max_x);
                     child_pos[4] = 0;
                     child_pos[5] = t[3] + t[1];
                 }
-                document->GetPages().RemovePageAt(pages.top()->GetIndex());
-                pages.pop();
-                painter->SetCanvas(*pages.top());
+                painter->SetCanvas(*pages[(pages.size()-1)*render]);
                 drawRect(max(pos[4], pos[6])+pos[0]+ml, pos[5]+pos[1]+mt,
                     max_x-pos[4]+pl+pr, child_pos[5]+child_pos[1]-pos[5]-pos[1]-mt+pb,
                     args["bgcolor"], "fill");
@@ -172,7 +171,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 new_args["padding_top"] = "0";
                 new_args["padding_bottom"] = "0";
                 for (xmlNode *el = node->children; el; el = el->next) {
-                    auto t = genNode(el, new_args, child_pos);
+                    auto t = genNode(el, new_args, child_pos, render);
                     child_pos[2] = t[4];
                     child_pos[3] = t[5];
                     max_x = max(t[2] + t[0], max_x);
@@ -189,7 +188,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 auto img = document->CreateImage();
                 img->Load(args["src"]);
                 painter->DrawImage(*img, max(pos[4], pos[6]) + pos[0],
-                                   pages.top()->GetRect().Height - pos[1] - pos[5] -
+                                   pages[pages.size()-1]->GetRect().Height - pos[1] - pos[5] -
                                        img->GetHeight());
             }
             // TODO vid
@@ -199,7 +198,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
             array<double, 8> child_pos{pos[4] + pos[0], pos[5] + pos[1], 0.0, 0.0, 0.0, 0.0, pos[6] - pos[4], pos[7] - pos[4]};
             double max_x = child_pos[4];
             for (xmlNode *el = node->children; el; el = el->next) {
-                auto t = genNode(el, new_args, child_pos);
+                auto t = genNode(el, new_args, child_pos, render);
                 child_pos[2] = t[4];
                 child_pos[3] = t[5];
                 max_x = max(t[2] + t[0], max_x);
@@ -214,7 +213,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                                     child_pos[5]+pos[5]};
         } else {
             node->name = reinterpret_cast<const xmlChar *>(obj.base.c_str());
-            return genNode(node, new_args, pos);
+            return genNode(node, new_args, pos, render);
         }
     } else if (node->type == XML_TEXT_NODE) {
         PdfFont *font = document->GetFonts().SearchFont(args["font"]);
@@ -237,7 +236,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 if (font->GetStringLength(substr, painter->TextState) + substr_coord_x > pos[7]) {
                     string s = text.substr(last_break, last_space - last_break + 1);
                     painter->DrawText(s, pos[0] + substr_coord_x,
-                                      pages.top()->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) -
+                                      pages[pages.size()-1]->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) -
                                           pos[3] - pos[1] - stod(args["font_size"]));
                     last_break = last_space + 1;
                     substr_coord_x = pos[6];
@@ -247,7 +246,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
             }
         }
         painter->DrawText(text.substr(last_break, text.length()), pos[0] + substr_coord_x,
-                          pages.top()->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) - pos[1] -
+                          pages[pages.size()-1]->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) - pos[1] -
                               pos[3] - stod(args["font_size"]));
         lines++;
         return array<double, 6>{pos[2],
@@ -256,7 +255,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                                 lines * font->GetLineSpacing(painter->TextState),
                                 font->GetStringLength(text.substr(last_break, text.length()), painter->TextState) +
                                     substr_coord_x,
-                                pages.top()->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) -
+                                pages[pages.size()-1]->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) -
                                     pos[3] - stod(args["font_size"])};
     } else {
         Out::errorMessage("Unsupported xml node type");
@@ -275,7 +274,7 @@ void PdfGen::drawRect(double x, double y, double w, double h, string color, stri
         Out::errorMessage("Rectangle draw mode is unknown");
     }
     painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
-    painter->DrawRectangle(x, pages.top()->GetRect().Height-y-h, w, h, m);
+    painter->DrawRectangle(x, pages[pages.size()-1]->GetRect().Height-y-h, w, h, m);
 }
 
 void PdfGen::genAttr(xmlAttr *attr, map<string, string> &args) {

@@ -41,7 +41,7 @@ class PdfGen {
     vector<PdfFont *> fonts;
     PdfMemDocument *document;
     PdfPainter *painter;
-    stack<PdfPage*> pages;
+    vector<PdfPage*> pages;
 
     PdfGen();
     ~PdfGen();
@@ -53,7 +53,7 @@ class PdfGen {
      *  returns {coordinates that have been used, size, coordinates that you should try to use first when rendering next
      * object}
      */
-    array<double, 6> genNode(xmlNode *node, map<string, string> &args, array<double, 8> pos);
+    array<double, 6> genNode(xmlNode *node, map<string, string> &args, array<double, 8> pos, int render);
     void drawRect(double x, double y, double w, double h, string color, string mode);
     static void genAttr(xmlAttr *attr, map<string, string> &args);
     static array<double, 3> genColor(const string &str);
