@@ -150,6 +150,74 @@ void ConfReader::parse() {
                                 } else {
                                     Out::errorMessage("Argument 'padding_bottom' is not numeric");
                                 }
+                            } else if (pname == "margin_x") {
+                                if (pval.is_double()) {
+                                    obj.args["margin_left"] = std::to_string(pval.as_double());
+                                    obj.args["margin_right"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["margin_left"] = std::to_string(pval.as_int64());
+                                    obj.args["margin_right"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'margin_x' is not numeric");
+                                }
+                            } else if (pname == "margin_y") {
+                                if (pval.is_double()) {
+                                    obj.args["margin_top"] = std::to_string(pval.as_double());
+                                    obj.args["margin_bottom"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["margin_top"] = std::to_string(pval.as_int64());
+                                    obj.args["margin_bottom"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'margin_y' is not numeric");
+                                }
+                            } else if (pname == "padding_x") {
+                                if (pval.is_double()) {
+                                    obj.args["padding_left"] = std::to_string(pval.as_double());
+                                    obj.args["padding_right"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["padding_left"] = std::to_string(pval.as_int64());
+                                    obj.args["padding_right"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'padding_x' is not numeric");
+                                }
+                            } else if (pname == "padding_y") {
+                                if (pval.is_double()) {
+                                    obj.args["padding_top"] = std::to_string(pval.as_double());
+                                    obj.args["padding_bottom"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["padding_top"] = std::to_string(pval.as_int64());
+                                    obj.args["padding_bottom"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'padding _y' is not numeric");
+                                }
+                            } else if (pname == "margin") {
+                                if (pval.is_double()) {
+                                    obj.args["margin_left"] = std::to_string(pval.as_double());
+                                    obj.args["margin_right"] = std::to_string(pval.as_double());
+                                    obj.args["margin_top"] = std::to_string(pval.as_double());
+                                    obj.args["margin_bottom"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["margin_left"] = std::to_string(pval.as_int64());
+                                    obj.args["margin_right"] = std::to_string(pval.as_int64());
+                                    obj.args["margin_top"] = std::to_string(pval.as_int64());
+                                    obj.args["margin_bottom"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'margin' is not numeric");
+                                }
+                            } else if (pname == "padding") {
+                                if (pval.is_double()) {
+                                    obj.args["padding_left"] = std::to_string(pval.as_double());
+                                    obj.args["padding_right"] = std::to_string(pval.as_double());
+                                    obj.args["padding_top"] = std::to_string(pval.as_double());
+                                    obj.args["padding_bottom"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["padding_left"] = std::to_string(pval.as_int64());
+                                    obj.args["padding_right"] = std::to_string(pval.as_int64());
+                                    obj.args["padding_top"] = std::to_string(pval.as_int64());
+                                    obj.args["padding_bottom"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'padding' is not numeric");
+                                }
                             } else if (pname == "src") {
                                 if (!pval.is_string()) {
                                     Out::errorMessage("Argument 'src' for node " + name + " is not string");
