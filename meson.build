@@ -33,6 +33,7 @@ src_files = ['src/main.hpp', 'src/main.cpp',
              'src/utils/Path.hpp', 'src/utils/Path.cpp',
              'src/utils/ArgsParser.hpp', 'src/utils/ArgsParser.cpp',
              'src/confReader/ConfReader.hpp', 'src/confReader/ConfReader.cpp',
-             'src/pdfGen/PdfGen.hpp', 'src/pdfGen/PdfGen.cpp']
+             'src/pdfGen/PdfGen.hpp', 'src/pdfGen/PdfGen.cpp',
+             'src/pdfGen/Pages.hpp', 'src/pdfGen/Pages.cpp']
 
 executable('sdt', src_files, dependencies : [podofo_dep, boost_dep, libxml2_dep], include_directories : incdir)
