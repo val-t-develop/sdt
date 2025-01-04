@@ -274,7 +274,27 @@ void PdfGen::drawRect(double x, double y, double w, double h, string color, stri
         Out::errorMessage("Rectangle draw mode is unknown");
     }
     painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
-    painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height-y-h, w, h, m);
+    if (y+h<pages.getActivePage(render)->GetRect().Height-50) {
+        painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height-y-h, w, h, m);
+    } else {
+        int active_page = pages.active;
+        painter->DrawRectangle(x, 50, w, pages.getActivePage(render)->GetRect().Height-y-50, m);
+        h-=pages.getActivePage(render)->GetRect().Height-y-50;
+        while (h>pages.getActivePage(render)->GetRect().Height-50) {
+            pages.addPage(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)), render);
+            painter->SetCanvas(*pages.getActivePage(render));
+            painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
+            painter->DrawRectangle(x, 50, w, pages.getActivePage(render)->GetRect().Height-100, m);
+            h -= pages.getActivePage(render)->GetRect().Height-200;
+        }
+        pages.addPage(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)), render);
+        painter->SetCanvas(*pages.getActivePage(render));
+        painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
+        painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height-h, w, h, m);
+        pages.active=active_page;
+        painter->SetCanvas(*pages.getActivePage(render));
+    }
+
 }
 
 void PdfGen::genAttr(xmlAttr *attr, map<string, string> &args) {
