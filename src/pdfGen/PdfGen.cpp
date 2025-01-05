@@ -70,7 +70,7 @@ void PdfGen::gen() {
             genAttr(attr, root_args);
         }
         array<double, 8> child_pos{stod(root_args["doc_margin_x"]),
-                                   stod(root_args["doc_margin_y"]),
+                                   0.0,
                                    0.0,
                                    0.0,
                                    0.0,
@@ -149,7 +149,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                     child_pos[5] = t[3] + t[1];
                 }
                 painter->SetCanvas(*pages.getActivePage(render));
-                drawRect(max(pos[4], pos[6])+pos[0]+ml, pos[5]+pos[1]+mt,
+                drawRect(args, max(pos[4], pos[6])+pos[0]+ml, pos[5]+pos[1]+mt,
                     max_x-pos[4]+pl+pr, child_pos[5]+child_pos[1]-pos[5]-pos[1]-mt+pb,
                     args["bgcolor"], "fill", render);
                 for (auto attr = node->properties; attr; attr = attr->next) {
@@ -188,8 +188,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 auto img = document->CreateImage();
                 img->Load(args["src"]);
                 painter->DrawImage(*img, max(pos[4], pos[6]) + pos[0],
-                                   pages.getActivePage(render)->GetRect().Height - pos[1] - pos[5] -
-                                       img->GetHeight());
+                                   pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"])
+                                   - pos[1] - pos[5] - img->GetHeight());
             }
             // TODO vid
             for (auto attr = node->properties; attr; attr = attr->next) {
@@ -236,7 +236,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 if (font->GetStringLength(substr, painter->TextState) + substr_coord_x > pos[7]) {
                     string s = text.substr(last_break, last_space - last_break + 1);
                     painter->DrawText(s, pos[0] + substr_coord_x,
-                                      pages.getActivePage(render)->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) -
+                                      pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"])  - lines * font->GetLineSpacing(painter->TextState) -
                                           pos[3] - pos[1] - stod(args["font_size"]));
                     last_break = last_space + 1;
                     substr_coord_x = pos[6];
@@ -246,7 +246,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
             }
         }
         painter->DrawText(text.substr(last_break, text.length()), pos[0] + substr_coord_x,
-                          pages.getActivePage(render)->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) - pos[1] -
+                          pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"])  - lines * font->GetLineSpacing(painter->TextState) - pos[1] -
                               pos[3] - stod(args["font_size"]));
         lines++;
         return array<double, 6>{pos[2],
@@ -255,7 +255,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                                 lines * font->GetLineSpacing(painter->TextState),
                                 font->GetStringLength(text.substr(last_break, text.length()), painter->TextState) +
                                     substr_coord_x,
-                                pages.getActivePage(render)->GetRect().Height - lines * font->GetLineSpacing(painter->TextState) -
+                                pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"]) - lines * font->GetLineSpacing(painter->TextState) -
                                     pos[3] - stod(args["font_size"])};
     } else {
         Out::errorMessage("Unsupported xml node type");
@@ -263,7 +263,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
     }
 }
 
-void PdfGen::drawRect(double x, double y, double w, double h, string color, string mode, int render) {
+void PdfGen::drawRect(map<string, string> &args, double x, double y, double w, double h, string color, string mode, int render) {
     auto col = genColor(color);
     PdfPathDrawMode m;
     if (mode == "fill") {
@@ -274,23 +274,23 @@ void PdfGen::drawRect(double x, double y, double w, double h, string color, stri
         Out::errorMessage("Rectangle draw mode is unknown");
     }
     painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
-    if (y+h<pages.getActivePage(render)->GetRect().Height-50) {
-        painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height-y-h, w, h, m);
+    if (y+h<(pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])*2)*pages.active) {
+        painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])-y-h, w, h, m);
     } else {
         int active_page = pages.active;
-        painter->DrawRectangle(x, 50, w, pages.getActivePage(render)->GetRect().Height-y-50, m);
-        h-=pages.getActivePage(render)->GetRect().Height-y-50;
-        while (h>pages.getActivePage(render)->GetRect().Height-50) {
+        painter->DrawRectangle(x, stod(args["doc_margin_y"]), w, pages.getActivePage(render)->GetRect().Height-y-stod(args["doc_margin_y"])*2, m);
+        h -= pages.getActivePage(render)->GetRect().Height-y-stod(args["doc_margin_y"])*2;
+        while (h>pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])*2) {
             pages.addPage(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)), render);
             painter->SetCanvas(*pages.getActivePage(render));
             painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
-            painter->DrawRectangle(x, 50, w, pages.getActivePage(render)->GetRect().Height-100, m);
-            h -= pages.getActivePage(render)->GetRect().Height-200;
+            painter->DrawRectangle(x, stod(args["doc_margin_y"]), w, pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])*2, m);
+            h -= pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])*2;
         }
         pages.addPage(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)), render);
         painter->SetCanvas(*pages.getActivePage(render));
         painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
-        painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height-h, w, h, m);
+        painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])-h, w, h, m);
         pages.active=active_page;
         painter->SetCanvas(*pages.getActivePage(render));
     }

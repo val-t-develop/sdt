@@ -53,7 +53,7 @@ class PdfGen {
      * object}
      */
     array<double, 6> genNode(xmlNode *node, map<string, string> &args, array<double, 8> pos, int render);
-    void drawRect(double x, double y, double w, double h, string color, string mode, int render);
+    void drawRect(map<string, string> &args,double x, double y, double w, double h, string color, string mode, int render);
     static void genAttr(xmlAttr *attr, map<string, string> &args);
     static array<double, 3> genColor(const string &str);
 };
