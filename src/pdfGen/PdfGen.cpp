@@ -235,9 +235,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 string substr = text.substr(last_break, i - last_break + 1);
                 if (font->GetStringLength(substr, painter->TextState) + substr_coord_x > pos[7]) {
                     string s = text.substr(last_break, last_space - last_break + 1);
-                    painter->DrawText(s, pos[0] + substr_coord_x,
-                                      pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"])  - lines * font->GetLineSpacing(painter->TextState) -
-                                          pos[3] - pos[1] - stod(args["font_size"]));
+                    drawText(args, s, pos[0] + substr_coord_x,
+                        lines * font->GetLineSpacing(painter->TextState) + pos[3] + pos[1] + stod(args["font_size"]), render);
                     last_break = last_space + 1;
                     substr_coord_x = pos[6];
                     lines++;
@@ -245,9 +244,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 last_space = i;
             }
         }
-        painter->DrawText(text.substr(last_break, text.length()), pos[0] + substr_coord_x,
-                          pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"])  - lines * font->GetLineSpacing(painter->TextState) - pos[1] -
-                              pos[3] - stod(args["font_size"]));
+        drawText(args, text.substr(last_break, text.length()), pos[0] + substr_coord_x,
+            lines * font->GetLineSpacing(painter->TextState) + pos[1] + pos[3] + stod(args["font_size"]), render);
         lines++;
         return array<double, 6>{pos[2],
                                 pos[3],
@@ -263,7 +261,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
     }
 }
 
-void PdfGen::drawRect(map<string, string> &args, double x, double y, double w, double h, string color, string mode, int render) {
+void PdfGen::drawRect(map<string, string> &args, double x, double y, double w, double h, string color, string mode,
+                      int render) {
     auto col = genColor(color);
     PdfPathDrawMode m;
     if (mode == "fill") {
@@ -274,27 +273,42 @@ void PdfGen::drawRect(map<string, string> &args, double x, double y, double w, d
         Out::errorMessage("Rectangle draw mode is unknown");
     }
     painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
-    if (y+h<(pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])*2)*pages.active) {
-        painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])-y-h, w, h, m);
+    if (y + h < (pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"]) * 2) * pages.active) {
+        painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"]) - y - h, w,
+                               h, m);
     } else {
         int active_page = pages.active;
-        painter->DrawRectangle(x, stod(args["doc_margin_y"]), w, pages.getActivePage(render)->GetRect().Height-y-stod(args["doc_margin_y"])*2, m);
-        h -= pages.getActivePage(render)->GetRect().Height-y-stod(args["doc_margin_y"])*2;
-        while (h>pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])*2) {
+        painter->DrawRectangle(x, stod(args["doc_margin_y"]), w,
+                               pages.getActivePage(render)->GetRect().Height - y - stod(args["doc_margin_y"]) * 2, m);
+        h -= pages.getActivePage(render)->GetRect().Height - y - stod(args["doc_margin_y"]) * 2;
+        while (h > pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"]) * 2) {
             pages.addPage(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)), render);
             painter->SetCanvas(*pages.getActivePage(render));
             painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
-            painter->DrawRectangle(x, stod(args["doc_margin_y"]), w, pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])*2, m);
-            h -= pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])*2;
+            painter->DrawRectangle(x, stod(args["doc_margin_y"]), w,
+                                   pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"]) * 2, m);
+            h -= pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"]) * 2;
         }
         pages.addPage(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)), render);
         painter->SetCanvas(*pages.getActivePage(render));
         painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
-        painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])-h, w, h, m);
-        pages.active=active_page;
+        painter->DrawRectangle(x, pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"]) - h, w, h,
+                               m);
+        pages.active = active_page;
         painter->SetCanvas(*pages.getActivePage(render));
     }
+}
 
+void PdfGen::drawText(map<string, string> &args, string text, double x, double y, int render) {
+    int p = fdiv(y*render, pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])*2);
+    painter->SetCanvas(document->GetPages().GetPageAt(p+1));
+    PdfFont *font = document->GetFonts().SearchFont(args["font"]);
+    if (font == nullptr)
+        throw std::runtime_error("Invalid handle");
+    painter->TextState.SetFont(*font, stod(args["font_size"]));
+    auto col = genColor(args["color"]);
+    painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
+    painter->DrawText(text, x, pages.getActivePage(render)->GetRect().Height-stod(args["doc_margin_y"])-fmod(y, pages.getActivePage(render)->GetRect().Height-2*stod(args["doc_margin_y"])));
 }
 
 void PdfGen::genAttr(xmlAttr *attr, map<string, string> &args) {

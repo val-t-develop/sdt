@@ -24,6 +24,7 @@
 
 #include <array>
 #include <cstdint>
+#include <cmath>
 #include <exception>
 #include <filesystem>
 #include <fstream>
