@@ -27,8 +27,10 @@ using namespace PoDoFo;
 
 class Pages {
 public:
-  vector<PdfPage*> pages = vector<PdfPage*>();
-  int active = -1;
-  void addPage(PdfPage *page, int render);
-  PdfPage* getActivePage(int render) const;
+    vector<PdfPage*> pages = vector<PdfPage*>();
+    int active = -1;
+    PdfMemDocument* document;
+    void addPage(int render);
+    PdfPage* getActivePage(int render);
+    void removeActivePage(int render);
 };

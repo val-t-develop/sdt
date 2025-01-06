@@ -22,6 +22,25 @@
  */
 #include "Pages.hpp"
 
-void Pages::addPage(PdfPage *page, int render) { if (render) {pages.push_back(page);active++;} }
+void Pages::addPage(int render) {
+    if (render) {
+        pages.push_back(&document->GetPages().CreatePage(PdfPage::CreateStandardPageSize(PdfPageSize::A4)));
+    }
+}
 
-PdfPage *Pages::getActivePage(int render) const { return pages[active*render];}
+PdfPage *Pages::getActivePage(int render) {
+    if (render) {
+        if ((active + 1) * render > pages.size()) {
+            addPage(render);
+        }
+    }
+    return pages[active * render];
+}
+
+void Pages::removeActivePage(int render) {
+    if (render) {
+        pages.erase(pages.begin() + active);
+        document->GetPages().RemovePageAt(active);
+        active--;
+    }
+}
