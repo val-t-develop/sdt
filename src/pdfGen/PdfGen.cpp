@@ -118,7 +118,6 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
 
         if (obj.base == "") {
             if (string(reinterpret_cast<const char *>(node->name)) == "__rect") {
-                painter->SetCanvas(*pages.getActivePage(0));
                 auto new_node = xmlCopyNode(node, 1);
                 for (auto attr = new_node->properties; attr; attr = attr->next) {
                     genAttr(attr, new_args);
@@ -220,10 +219,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
         PdfFont *font = document->GetFonts().SearchFont(args["font"]);
         if (font == nullptr)
             throw std::runtime_error("Invalid handle");
-
         painter->TextState.SetFont(*font, stod(args["font_size"]));
-        auto col = genColor(args["color"]);
-        painter->GraphicsState.SetFillColor(PdfColor(col[0], col[1], col[2]));
         string text(reinterpret_cast<char *>(node->content));
         text.erase(std::ranges::remove(text, '\n').begin(), text.end());
         boost::trim(text);
@@ -234,6 +230,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
         for (int i = 0; i < text.length(); i++) {
             if (text[i] == ' ') {
                 string substr = text.substr(last_break, i - last_break + 1);
+                painter->TextState.SetFont(*font, stod(args["font_size"]));
                 if (font->GetStringLength(substr, painter->TextState) + substr_coord_x > pos[7]) {
                     string s = text.substr(last_break, last_space - last_break + 1);
                     drawText(args, s, pos[0] + substr_coord_x,
@@ -245,7 +242,8 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                 last_space = i;
             }
         }
-        drawText(args, text.substr(last_break, text.length()), pos[0] + substr_coord_x,
+        painter->TextState.SetFont(*font, stod(args["font_size"]));
+        drawText(args, text.substr(last_break, text.length()-last_break), pos[0] + substr_coord_x,
             lines * font->GetLineSpacing(painter->TextState) + pos[1] + pos[3] + stod(args["font_size"]), render);
         lines++;
         return array<double, 6>{pos[2],
@@ -254,8 +252,7 @@ array<double, 6> PdfGen::genNode(xmlNode *node, map<string, string> &args, array
                                 lines * font->GetLineSpacing(painter->TextState),
                                 font->GetStringLength(text.substr(last_break, text.length()), painter->TextState) +
                                     substr_coord_x,
-                                pages.getActivePage(render)->GetRect().Height - stod(args["doc_margin_y"]) - lines * font->GetLineSpacing(painter->TextState) -
-                                    pos[3] - stod(args["font_size"])};
+                                0.0}; // TODO
     } else {
         Out::errorMessage("Unsupported xml node type");
         return array<double, 6>{-1, -1, -1, -1, -1, -1};
