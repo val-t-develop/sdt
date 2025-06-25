@@ -18,30 +18,44 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Some definitions used in project.
  */
+#pragma once
 
-#include <main.hpp>
-#include <utils/ArgsParser.hpp>
-#include <utils/Out.hpp>
-#include <confReader/ConfReader.hpp>
-#include <parser/Parser.hpp>
+#include <array>
+#include <cstdint>
+#include <cmath>
+#include <exception>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <stack>
+#include <string>
+#include <utility>
+#include <vector>
 
-int main(int argc, char **argv) {
-    Main::main(argc, argv);
-    return 0;
-}
+using std::array;
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::make_shared;
+using std::make_unique;
+using std::pair;
+using std::shared_ptr;
+using std::string;
+using std::unique_ptr;
+using std::vector;
+namespace fs = std::filesystem;
+using std::exception;
+using std::fstream;
+using std::ifstream;
+using std::map;
+using std::max;
+using std::min;
+using std::ofstream;
+using std::stack;
 
-void Main::main(int argc, char **argv) {
-    ArgsParser::parseArgs(argc, argv);
-    if (ArgsParser::src->isFile()) {
-        if (ArgsParser::conf != nullptr) {
-            ConfReader conf_reader;
-            conf_reader.parse();
-        }
-        Parser parser{};
-        parser.parse();
-    } else {
-        Out::errorMessage("Processing directories is unsupported");
-    }
-}
+vector<string> split(string s, string delimiter);
+int64_t power(int base, int exponent);

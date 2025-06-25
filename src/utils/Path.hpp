@@ -18,30 +18,30 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Filesystem helper file.
  */
 
-#include <main.hpp>
-#include <utils/ArgsParser.hpp>
-#include <utils/Out.hpp>
-#include <confReader/ConfReader.hpp>
-#include <parser/Parser.hpp>
+#pragma once
+#include <Defs.hpp>
 
-int main(int argc, char **argv) {
-    Main::main(argc, argv);
-    return 0;
-}
+class Path {
+    fs::path path;
+    string content;
 
-void Main::main(int argc, char **argv) {
-    ArgsParser::parseArgs(argc, argv);
-    if (ArgsParser::src->isFile()) {
-        if (ArgsParser::conf != nullptr) {
-            ConfReader conf_reader;
-            conf_reader.parse();
-        }
-        Parser parser{};
-        parser.parse();
-    } else {
-        Out::errorMessage("Processing directories is unsupported");
-    }
-}
+  public:
+    Path();
+    Path(string name);
+    Path(fs::path &path);
+
+    string getName() const;
+    string getFilename();
+    string readFile();
+    bool isFile();
+    bool isDir();
+    vector<Path> getDirContent();
+    Path getParent();
+    static Path getCurrentDir();
+    bool operator<(const Path &) const;
+    bool operator>(const Path &) const;
+    bool operator==(const Path &) const;
+};

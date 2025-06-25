@@ -26,6 +26,12 @@ boost_dep = dependency('boost', modules : ['json'])
 libxml2_dep = dependency('libxml2')
 
 incdir = include_directories('src')
-src_files = ['src/main.hpp', 'src/main.cpp']
+src_files = ['src/main.hpp', 'src/main.cpp',
+             'src/Defs.hpp', 'src/Defs.cpp', 'src/utils/License.hpp',
+             'src/utils/Out.hpp', 'src/utils/Out.cpp',
+             'src/utils/Path.hpp', 'src/utils/Path.cpp',
+             'src/utils/ArgsParser.hpp', 'src/utils/ArgsParser.cpp',
+             'src/confReader/ConfReader.hpp', 'src/confReader/ConfReader.cpp',
+             'src/parser/Parser.hpp', 'src/parser/Parser.cpp']
 
 executable('sdt', src_files, dependencies : [boost_dep, libxml2_dep], include_directories : incdir)

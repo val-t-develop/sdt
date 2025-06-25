@@ -18,30 +18,16 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Output utility.
  */
 
-#include <main.hpp>
-#include <utils/ArgsParser.hpp>
-#include <utils/Out.hpp>
-#include <confReader/ConfReader.hpp>
-#include <parser/Parser.hpp>
+#pragma once
+#include <Defs.hpp>
 
-int main(int argc, char **argv) {
-    Main::main(argc, argv);
-    return 0;
-}
+class Out {
+  public:
+    static int messages;
 
-void Main::main(int argc, char **argv) {
-    ArgsParser::parseArgs(argc, argv);
-    if (ArgsParser::src->isFile()) {
-        if (ArgsParser::conf != nullptr) {
-            ConfReader conf_reader;
-            conf_reader.parse();
-        }
-        Parser parser{};
-        parser.parse();
-    } else {
-        Out::errorMessage("Processing directories is unsupported");
-    }
-}
+    static void errorMessage(string msg);
+    static void printMessage(string msg);
+};

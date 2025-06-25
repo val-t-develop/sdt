@@ -18,30 +18,25 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Parser.
  */
+#pragma once
+#include <Defs.hpp>
+#include <libxml/parser.h>
 
-#include <main.hpp>
-#include <utils/ArgsParser.hpp>
-#include <utils/Out.hpp>
-#include <confReader/ConfReader.hpp>
-#include <parser/Parser.hpp>
+class Parser {
+public:
+    class Obj {
+    public:
+        string base;
+        map<string, string> args;
+    };
+    static map<string, Obj> objs;
 
-int main(int argc, char **argv) {
-    Main::main(argc, argv);
-    return 0;
-}
+    xmlDoc *xml_document;
 
-void Main::main(int argc, char **argv) {
-    ArgsParser::parseArgs(argc, argv);
-    if (ArgsParser::src->isFile()) {
-        if (ArgsParser::conf != nullptr) {
-            ConfReader conf_reader;
-            conf_reader.parse();
-        }
-        Parser parser{};
-        parser.parse();
-    } else {
-        Out::errorMessage("Processing directories is unsupported");
-    }
-}
+    Parser();
+    ~Parser();
+    void parse();
+};
+

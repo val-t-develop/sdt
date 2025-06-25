@@ -18,30 +18,28 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Some definitions used in project.
  */
+#include "Defs.hpp"
 
-#include <main.hpp>
-#include <utils/ArgsParser.hpp>
-#include <utils/Out.hpp>
-#include <confReader/ConfReader.hpp>
-#include <parser/Parser.hpp>
+vector<string> split(string s, string delimiter) {
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    string token;
+    vector<string> res;
 
-int main(int argc, char **argv) {
-    Main::main(argc, argv);
-    return 0;
-}
-
-void Main::main(int argc, char **argv) {
-    ArgsParser::parseArgs(argc, argv);
-    if (ArgsParser::src->isFile()) {
-        if (ArgsParser::conf != nullptr) {
-            ConfReader conf_reader;
-            conf_reader.parse();
-        }
-        Parser parser{};
-        parser.parse();
-    } else {
-        Out::errorMessage("Processing directories is unsupported");
+    while ((pos_end = s.find(delimiter, pos_start)) != string::npos) {
+        token = s.substr(pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back(token);
     }
+
+    res.push_back(s.substr(pos_start));
+    return res;
+}
+int64_t power(int base, int exponent) {
+    int64_t result = 1;
+    for (int i = 0; i < exponent; ++i) {
+        result *= base;
+    }
+    return result;
 }

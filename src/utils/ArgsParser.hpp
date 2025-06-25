@@ -18,30 +18,19 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Parser of arguments.
  */
 
-#include <main.hpp>
-#include <utils/ArgsParser.hpp>
-#include <utils/Out.hpp>
-#include <confReader/ConfReader.hpp>
-#include <parser/Parser.hpp>
+#pragma once
+#include <Defs.hpp>
+#include <utils/Path.hpp>
 
-int main(int argc, char **argv) {
-    Main::main(argc, argv);
-    return 0;
-}
+class ArgsParser {
+  public:
+    static shared_ptr<Path> output;
+    static shared_ptr<Path> conf;
+    static shared_ptr<Path> src;
 
-void Main::main(int argc, char **argv) {
-    ArgsParser::parseArgs(argc, argv);
-    if (ArgsParser::src->isFile()) {
-        if (ArgsParser::conf != nullptr) {
-            ConfReader conf_reader;
-            conf_reader.parse();
-        }
-        Parser parser{};
-        parser.parse();
-    } else {
-        Out::errorMessage("Processing directories is unsupported");
-    }
-}
+    static void parseArgs(int argc, char **argv);
+    static void parseArgs(vector<string> args);
+};

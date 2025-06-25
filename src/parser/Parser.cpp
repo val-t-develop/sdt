@@ -18,30 +18,20 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Main project file.
+ *  Parser.
  */
-
-#include <main.hpp>
+#include "Parser.hpp"
 #include <utils/ArgsParser.hpp>
-#include <utils/Out.hpp>
-#include <confReader/ConfReader.hpp>
-#include <parser/Parser.hpp>
 
-int main(int argc, char **argv) {
-    Main::main(argc, argv);
-    return 0;
+map<string, Parser::Obj> Parser::objs = map<string, Obj>();
+
+Parser::Parser() {
+    xmlInitParser();
+    xml_document = xmlReadFile(ArgsParser::src->getName().c_str(), nullptr, XML_PARSE_NOBLANKS);
 }
 
-void Main::main(int argc, char **argv) {
-    ArgsParser::parseArgs(argc, argv);
-    if (ArgsParser::src->isFile()) {
-        if (ArgsParser::conf != nullptr) {
-            ConfReader conf_reader;
-            conf_reader.parse();
-        }
-        Parser parser{};
-        parser.parse();
-    } else {
-        Out::errorMessage("Processing directories is unsupported");
-    }
+Parser::~Parser() { xmlCleanupParser(); }
+
+void Parser::parse() {
+    const xmlNode *root = xmlDocGetRootElement(xml_document);
 }
