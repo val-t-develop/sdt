@@ -41,6 +41,10 @@ void Main::main(int argc, char **argv) {
         }
         Parser parser{};
         parser.parse();
+        system(("fop -xml sdt_input.xml -xsl sdt_transform.xsl -pdf " + ArgsParser::output->getName()).c_str());
+        if (!ArgsParser::debug) {
+            system("rm sdt_input.xml sdt_transform.xsl");
+        }
     } else {
         Out::errorMessage("Processing directories is unsupported");
     }

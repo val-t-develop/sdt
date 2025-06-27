@@ -18,23 +18,21 @@
 /*
  *  Valentyn Tymchyshyn (val.t.develop) (val.t.develop@gmail.com)
  *
- *  Parser.
+ *  Generator of xsl.
  */
-#include "Parser.hpp"
-#include <utils/ArgsParser.hpp>
+#pragma once
+#include <Defs.hpp>
+#include <libxml/parser.h>
 
-map<string, Parser::Obj> Parser::objs = map<string, Obj>();
+class XSLGen {
+public:
+    xmlDoc *xml_document;
+    xmlDoc *xsl_document;
+    vector<xmlNode*> xml_nodes;
+    vector<xmlNode*> xsl_nodes;
 
-Parser::Parser() {
-    xmlInitParser();
-    xml_document = xmlReadFile(ArgsParser::src->getName().c_str(), nullptr, XML_PARSE_NOBLANKS);
-    xsl_gen = XSLGen();
-}
+    XSLGen();
+    ~XSLGen();
 
-Parser::~Parser() {
-    xmlCleanupParser();
-}
-
-void Parser::parse() {
-    const xmlNode *root = xmlDocGetRootElement(xml_document);
-}
+    size_t addNode(size_t parent, string name, vector<pair<string, string>> attrs);
+};

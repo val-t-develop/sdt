@@ -21,6 +21,8 @@
  *  Parser.
  */
 #pragma once
+#include "XSLGen/XSLGen.hpp"
+
 #include <Defs.hpp>
 #include <libxml/parser.h>
 
@@ -34,6 +36,7 @@ public:
     static map<string, Obj> objs;
 
     xmlDoc *xml_document;
+    XSLGen xsl_gen;
 
     Parser();
     ~Parser();

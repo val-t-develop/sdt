@@ -27,6 +27,7 @@
 shared_ptr<Path> ArgsParser::output = nullptr;
 shared_ptr<Path> ArgsParser::conf = nullptr;
 shared_ptr<Path> ArgsParser::src = nullptr;
+bool ArgsParser::debug = false;
 
 void ArgsParser::parseArgs(int argc, char **argv) {
     string home = getenv("HOME");
@@ -57,6 +58,8 @@ void ArgsParser::parseArgs(vector<string> args) {
             i++;
             arg = args[i];
             conf = make_shared<Path>(arg);
+        } else if (arg == "-g" || arg == "-d") {
+            debug = true;
         } else if (arg == "show") {
             i++;
             arg = args[i];

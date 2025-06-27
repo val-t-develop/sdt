@@ -32,6 +32,7 @@ src_files = ['src/main.hpp', 'src/main.cpp',
              'src/utils/Path.hpp', 'src/utils/Path.cpp',
              'src/utils/ArgsParser.hpp', 'src/utils/ArgsParser.cpp',
              'src/confReader/ConfReader.hpp', 'src/confReader/ConfReader.cpp',
-             'src/parser/Parser.hpp', 'src/parser/Parser.cpp']
+             'src/parser/Parser.hpp', 'src/parser/Parser.cpp',
+             'src/XSLGen/XSLGen.hpp', 'src/XSLGen/XSLGen.cpp']
 
 executable('sdt', src_files, dependencies : [boost_dep, libxml2_dep], include_directories : incdir)
