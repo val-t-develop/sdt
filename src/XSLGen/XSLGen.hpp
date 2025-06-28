@@ -25,14 +25,16 @@
 #include <libxml/parser.h>
 
 class XSLGen {
+    xmlNode *xsl_stylesheet;
 public:
     xmlDoc *xml_document;
     xmlDoc *xsl_document;
-    vector<xmlNode*> xml_nodes;
-    vector<xmlNode*> xsl_nodes;
+    vector<xmlNode*> xml_nodes = vector<xmlNode*>();
+    vector<xmlNode*> xsl_nodes = vector<xmlNode*>();
 
     XSLGen();
     ~XSLGen();
 
-    size_t addNode(size_t parent, string name, vector<pair<string, string>> attrs);
+    size_t addBlock(size_t parent, map<string, string> attrs);
+    void addText(size_t parent, string text);
 };

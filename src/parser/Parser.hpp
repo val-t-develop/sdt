@@ -41,5 +41,6 @@ public:
     Parser();
     ~Parser();
     void parse();
+    void genNode(xmlNode *node, size_t parent, map<string, string> attrs);
 };
 

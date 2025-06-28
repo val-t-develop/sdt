@@ -36,5 +36,36 @@ Parser::~Parser() {
 }
 
 void Parser::parse() {
-    const xmlNode *root = xmlDocGetRootElement(xml_document);
+    xmlNode *root = xmlDocGetRootElement(xml_document);
+    genNode(root, 0, map<string, string>());
+}
+
+void Parser::genNode(xmlNode *node, size_t parent, map<string, string> attrs) {
+    string base = "block";
+    if (objs.contains(string((char*) node->name))) {
+        Obj obj = objs[string((char*) node->name)];
+        if (!obj.base.empty()) {
+            base = obj.base;
+        }
+        for (auto el : obj.args) {
+            attrs[el.first] = el.second;
+        }
+    }
+
+    for (auto attr = node->properties; attr; attr = attr->next) {
+        attrs[(char*) attr->name] = (char*) attr->children->content;
+    }
+
+    size_t id = 0;
+    if (base == "block") {
+        id = xsl_gen.addBlock(parent, attrs);
+    }
+
+    for (auto el = node->children; el; el = el->next) {
+        if (el->type == XML_ELEMENT_NODE) {
+            genNode(el, id, attrs);
+        } else if (el->type == XML_TEXT_NODE) {
+            xsl_gen.addText(id, (char*) el->content);
+        }
+    }
 }
