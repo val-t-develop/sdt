@@ -37,11 +37,12 @@ Parser::~Parser() {
 
 void Parser::parse() {
     xmlNode *root = xmlDocGetRootElement(xml_document);
-    genNode(root, 0, map<string, string>());
+    genNode(root, 0);
 }
 
-void Parser::genNode(xmlNode *node, size_t parent, map<string, string> attrs) {
+void Parser::genNode(xmlNode *node, size_t parent) {
     string base = "block";
+    map<string, string> attrs = map<string, string>();
     if (objs.contains(string((char*) node->name))) {
         Obj obj = objs[string((char*) node->name)];
         if (!obj.base.empty()) {
@@ -63,7 +64,7 @@ void Parser::genNode(xmlNode *node, size_t parent, map<string, string> attrs) {
 
     for (auto el = node->children; el; el = el->next) {
         if (el->type == XML_ELEMENT_NODE) {
-            genNode(el, id, attrs);
+            genNode(el, id);
         } else if (el->type == XML_TEXT_NODE) {
             xsl_gen.addText(id, (char*) el->content);
         }

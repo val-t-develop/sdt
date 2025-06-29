@@ -56,11 +56,11 @@ for (auto arg : conf) {
                                     Out::errorMessage("Argument 'font' for node " + name + " is not string");
                                 }
                                 obj.args["font"] = string(pval.as_string().c_str());
-                            } else if (pname == "font_size") {
+                            } else if (pname == "font-size") {
                                 if (pval.is_double()) {
-                                    obj.args["font_size"] = std::to_string(pval.as_double());
+                                    obj.args["font-size"] = std::to_string(pval.as_double());
                                 } else if (pval.is_int64()) {
-                                    obj.args["font_size"] = std::to_string(pval.as_int64());
+                                    obj.args["font-size"] = std::to_string(pval.as_int64());
                                 } else {
                                     Out::errorMessage("Argument 'font_size' for node " + name + " is not numeric");
                                 }
@@ -223,42 +223,212 @@ for (auto arg : conf) {
                                     Out::errorMessage("Argument 'src' for node " + name + " is not string");
                                 }
                                 obj.args["src"] = string(pval.as_string().c_str());
-                            } else if (pname == "color") {
+                            } else if (pname == "font-color") {
                                 if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'color' for node " + name + " is not string");
+                                    Out::errorMessage("Argument 'font-color' for node " + name + " is not string");
                                 }
-                                string color(pval.as_string().c_str());
-                                if (color.size() != 6) {
-                                    Out::errorMessage("Argument 'color' for node " + name +
+                                string font_color(pval.as_string().c_str());
+                                if (font_color.size() != 6) {
+                                    Out::errorMessage("Argument 'font-color' for node " + name +
                                                       " is not 6 character string");
                                 }
-                                for (auto c : color) {
+                                for (auto c : font_color) {
                                     if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
                                         c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
                                         c != 'C' && c != 'D' && c != 'E' && c != 'F') {
-                                        Out::errorMessage("Argument 'color' for node " + name + " can not contain '" +
+                                        Out::errorMessage("Argument 'font-color' for node " + name + " can not contain '" +
                                                           c + "' character");
                                     }
                                 }
-                                obj.args["color"] = color;
-                            } else if (pname == "bgcolor") {
+                                obj.args["font-color"] = font_color;
+                            } else if (pname == "background-color") {
                                 if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'bgcolor' for node " + name + " is not string");
+                                    Out::errorMessage("Argument 'background-color' for node " + name + " is not string");
                                 }
-                                string bgcolor(pval.as_string().c_str());
-                                if (bgcolor.size() != 6) {
-                                    Out::errorMessage("Argument 'bgcolor' for node " + name +
+                                string background_color(pval.as_string().c_str());
+                                if (background_color.size() != 6) {
+                                    Out::errorMessage("Argument 'background-color' for node " + name +
                                                       " is not 6 character string");
                                 }
-                                for (auto c : bgcolor) {
+                                for (auto c : background_color) {
                                     if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
                                         c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
                                         c != 'C' && c != 'D' && c != 'E' && c != 'F') {
-                                        Out::errorMessage("Argument 'bgcolor' for node " + name + " can not contain '" +
+                                        Out::errorMessage("Argument 'background-color' for node " + name + " can not contain '" +
                                                           c + "' character");
                                     }
                                 }
-                                obj.args["bgcolor"] = bgcolor;
+                                obj.args["background-color"] = background_color;
+                            } else if (pname == "left-border-width") {
+                                if (pval.is_double()) {
+                                    obj.args["left-border-width"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["left-border-width"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'left-border-width' is not numeric");
+                                }
+                            } else if (pname == "left-border-style") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'left-border-style' for node " + name + " is not string");
+                                }
+                                obj.args["left-border-style"] = string(pval.as_string().c_str());
+                            } else if (pname == "left-border-color") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'left-border-color' for node " + name + " is not string");
+                                }
+                                string left_border_color(pval.as_string().c_str());
+                                if (left_border_color.size() != 6) {
+                                    Out::errorMessage("Argument 'left-border-color' for node " + name +
+                                                      " is not 6 character string");
+                                }
+                                for (auto c : left_border_color) {
+                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
+                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
+                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
+                                        Out::errorMessage("Argument 'left-border-color' for node " + name + " can not contain '" +
+                                                          c + "' character");
+                                        }
+                                }
+                                obj.args["left-border-color"] = left_border_color;
+                            } else if (pname == "right-border-width") {
+                                if (pval.is_double()) {
+                                    obj.args["right-border-width"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["right-border-width"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'right-border-width' is not numeric");
+                                }
+                            } else if (pname == "right-border-style") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'right-border-style' for node " + name + " is not string");
+                                }
+                                obj.args["right-border-style"] = string(pval.as_string().c_str());
+                            } else if (pname == "right-border-color") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'right-border-color' for node " + name + " is not string");
+                                }
+                                string right_border_color(pval.as_string().c_str());
+                                if (right_border_color.size() != 6) {
+                                    Out::errorMessage("Argument 'right-border-color' for node " + name +
+                                                      " is not 6 character string");
+                                }
+                                for (auto c : right_border_color) {
+                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
+                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
+                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
+                                        Out::errorMessage("Argument 'right-border-color' for node " + name + " can not contain '" +
+                                                          c + "' character");
+                                        }
+                                }
+                                obj.args["right-border-color"] = right_border_color;
+                            } else if (pname == "top-border-width") {
+                                if (pval.is_double()) {
+                                    obj.args["top-border-width"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["top-border-width"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'top-border-width' is not numeric");
+                                }
+                            } else if (pname == "top-border-style") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'top-border-style' for node " + name + " is not string");
+                                }
+                                obj.args["top-border-style"] = string(pval.as_string().c_str());
+                            } else if (pname == "top-border-color") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'top-border-color' for node " + name + " is not string");
+                                }
+                                string top_border_color(pval.as_string().c_str());
+                                if (top_border_color.size() != 6) {
+                                    Out::errorMessage("Argument 'top-border-color' for node " + name +
+                                                      " is not 6 character string");
+                                }
+                                for (auto c : top_border_color) {
+                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
+                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
+                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
+                                        Out::errorMessage("Argument 'top-border-color' for node " + name + " can not contain '" +
+                                                          c + "' character");
+                                        }
+                                }
+                                obj.args["top-border-color"] = top_border_color;
+                            } else if (pname == "bottom-border-width") {
+                                if (pval.is_double()) {
+                                    obj.args["bottom-border-width"] = std::to_string(pval.as_double());
+                                } else if (pval.is_int64()) {
+                                    obj.args["bottom-border-width"] = std::to_string(pval.as_int64());
+                                } else {
+                                    Out::errorMessage("Argument 'bottom-border-width' is not numeric");
+                                }
+                            } else if (pname == "bottom-border-style") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'bottom-border-style' for node " + name + " is not string");
+                                }
+                                obj.args["bottom-border-style"] = string(pval.as_string().c_str());
+                            } else if (pname == "bottom-border-color") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'bottom-border-color' for node " + name + " is not string");
+                                }
+                                string bottom_border_color(pval.as_string().c_str());
+                                if (bottom_border_color.size() != 6) {
+                                    Out::errorMessage("Argument 'bottom-border-color' for node " + name +
+                                                      " is not 6 character string");
+                                }
+                                for (auto c : bottom_border_color) {
+                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
+                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
+                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
+                                        Out::errorMessage("Argument 'bottom-border-color' for node " + name + " can not contain '" +
+                                                          c + "' character");
+                                        }
+                                }
+                                obj.args["bottom-border-color"] = bottom_border_color;
+                            } else if (pname == "border-width") {
+                                if (pval.is_double()) {
+                                    string border_width = std::to_string(pval.as_double());
+                                    obj.args["left-border-width"] = !obj.args.contains("left-border-width") ? border_width : obj.args["left-border-width"];
+                                    obj.args["right-border-width"] = !obj.args.contains("right-border-width") ? border_width : obj.args["right-border-width"];
+                                    obj.args["top-border-width"] = !obj.args.contains("top-border-width") ? border_width : obj.args["top-border-width"];
+                                    obj.args["bottom-border-width"] = !obj.args.contains("bottom-border-width") ? border_width : obj.args["bottom-border-width"];
+                                } else if (pval.is_int64()) {
+                                    string border_width = std::to_string(pval.as_int64());
+                                    obj.args["left-border-width"] = !obj.args.contains("left-border-width") ? border_width : obj.args["left-border-width"];
+                                    obj.args["right-border-width"] = !obj.args.contains("right-border-width") ? border_width : obj.args["right-border-width"];
+                                    obj.args["top-border-width"] = !obj.args.contains("top-border-width") ? border_width : obj.args["top-border-width"];
+                                    obj.args["bottom-border-width"] = !obj.args.contains("bottom-border-width") ? border_width : obj.args["bottom-border-width"];
+                                } else {
+                                    Out::errorMessage("Argument 'border-width' is not numeric");
+                                }
+                            } else if (pname == "border-style") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'border-style' for node " + name + " is not string");
+                                }
+                                string border_style = string(pval.as_string().c_str());
+                                obj.args["left-border-style"] = !obj.args.contains("left-border-style") ? border_style : obj.args["left-border-style"];
+                                obj.args["right-border-style"] = !obj.args.contains("right-border-style") ? border_style : obj.args["right-border-style"];
+                                obj.args["top-border-style"] = !obj.args.contains("top-border-style") ? border_style : obj.args["top-border-style"];
+                                obj.args["bottom-border-style"] = !obj.args.contains("bottom-border-style") ? border_style : obj.args["bottom-border-style"];
+                            } else if (pname == "border-color") {
+                                if (!pval.is_string()) {
+                                    Out::errorMessage("Argument 'border-color' for node " + name + " is not string");
+                                }
+                                string border_color(pval.as_string().c_str());
+                                if (border_color.size() != 6) {
+                                    Out::errorMessage("Argument 'border-color' for node " + name +
+                                                      " is not 6 character string");
+                                }
+                                for (auto c : border_color) {
+                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
+                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
+                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
+                                        Out::errorMessage("Argument 'border-color' for node " + name + " can not contain '" +
+                                                          c + "' character");
+                                        }
+                                }
+                                obj.args["left-border-color"] = !obj.args.contains("left-border-color") ? border_color : obj.args["left-border-color"];
+                                obj.args["right-border-color"] = !obj.args.contains("right-border-color") ? border_color : obj.args["right-border-color"];
+                                obj.args["top-border-color"] = !obj.args.contains("top-border-color") ? border_color : obj.args["top-border-color"];
+                                obj.args["bottom-border-color"] = !obj.args.contains("bottom-border-color") ? border_color : obj.args["bottom-border-color"];
                             } else {
                                 Out::errorMessage("WARNING: argument '" + name + "' is not known and will be ignored");
                             }
