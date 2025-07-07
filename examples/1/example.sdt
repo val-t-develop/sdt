@@ -1,0 +1,5 @@
+<doc>
+    <title>
+        To run this use "sdt example.sdt -c conf.json -o example.pdf"
+    </title>
+</doc>

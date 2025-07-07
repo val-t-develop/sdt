@@ -1,0 +1,15 @@
+{
+  "nodes": {
+    "title": {
+      "font-size": 14,
+      "font-color": "FF0000",
+      "background-color": "00FF00",
+      "border-color": "0000FF",
+      "left-border-color": "000000",
+      "border-width": 3,
+      "top-border-width": 5,
+      "border-style": "solid",
+      "bottom-border-style": "dashed"
+    }
+  }
+}
