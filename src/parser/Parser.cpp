@@ -21,6 +21,9 @@
  *  Parser.
  */
 #include "Parser.hpp"
+
+#include "confReader/ConfReader.hpp"
+
 #include <utils/ArgsParser.hpp>
 
 map<string, Parser::Obj> Parser::objs = map<string, Obj>();
@@ -54,7 +57,7 @@ void Parser::genNode(xmlNode *node, size_t parent) {
     }
 
     for (auto attr = node->properties; attr; attr = attr->next) {
-        attrs[(char*) attr->name] = (char*) attr->children->content;
+        ConfReader::parseOption((char*) node->name, (char*) attr->name, (char*) attr->children->content, attrs);
     }
 
     size_t id = 0;

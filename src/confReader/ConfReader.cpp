@@ -22,8 +22,8 @@
  */
 #include "ConfReader.hpp"
 
-#include <utils/ArgsParser.hpp>
 #include <parser/Parser.hpp>
+#include <utils/ArgsParser.hpp>
 #include <utils/Out.hpp>
 
 ConfReader::ConfReader() {
@@ -34,7 +34,7 @@ ConfReader::ConfReader() {
 }
 
 void ConfReader::parse() {
-for (auto arg : conf) {
+    for (auto arg : conf) {
         if (arg.key() == "nodes") {
             if (arg.value().is_object()) {
                 auto nodes = arg.value().as_object();
@@ -45,366 +45,15 @@ for (auto arg : conf) {
                         Parser::Obj obj{};
                         for (auto param : params) {
                             string pname(param.key());
-                            auto pval = param.value();
-                            if (pname == "base") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'base' for node " + name + " is not string");
-                                }
-                                obj.base = string(pval.as_string().c_str());
-                            } else if (pname == "font") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'font' for node " + name + " is not string");
-                                }
-                                obj.args["font"] = string(pval.as_string().c_str());
-                            } else if (pname == "font-size") {
-                                if (pval.is_double()) {
-                                    obj.args["font-size"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["font-size"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'font_size' for node " + name + " is not numeric");
-                                }
-                            } else if (pname == "font-color") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'font-color' for node " + name + " is not string");
-                                }
-                                string font_color(pval.as_string().c_str());
-                                if (font_color.size() != 6) {
-                                    Out::errorMessage("Argument 'font-color' for node " + name +
-                                                      " is not 6 character string");
-                                }
-                                for (auto c : font_color) {
-                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
-                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
-                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
-                                        Out::errorMessage("Argument 'font-color' for node " + name + " can not contain '" +
-                                                          c + "' character");
-                                    }
-                                }
-                                obj.args["font-color"] = font_color;
-                            } else if (pname == "background-color") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'background-color' for node " + name + " is not string");
-                                }
-                                string background_color(pval.as_string().c_str());
-                                if (background_color.size() != 6) {
-                                    Out::errorMessage("Argument 'background-color' for node " + name +
-                                                      " is not 6 character string");
-                                }
-                                for (auto c : background_color) {
-                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
-                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
-                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
-                                        Out::errorMessage("Argument 'background-color' for node " + name + " can not contain '" +
-                                                          c + "' character");
-                                    }
-                                }
-                                obj.args["background-color"] = background_color;
-                            } else if (pname == "left-border-width") {
-                                if (pval.is_double()) {
-                                    obj.args["left-border-width"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["left-border-width"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'left-border-width' is not numeric");
-                                }
-                            } else if (pname == "left-border-style") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'left-border-style' for node " + name + " is not string");
-                                }
-                                obj.args["left-border-style"] = string(pval.as_string().c_str());
-                            } else if (pname == "left-border-color") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'left-border-color' for node " + name + " is not string");
-                                }
-                                string left_border_color(pval.as_string().c_str());
-                                if (left_border_color.size() != 6) {
-                                    Out::errorMessage("Argument 'left-border-color' for node " + name +
-                                                      " is not 6 character string");
-                                }
-                                for (auto c : left_border_color) {
-                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
-                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
-                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
-                                        Out::errorMessage("Argument 'left-border-color' for node " + name + " can not contain '" +
-                                                          c + "' character");
-                                        }
-                                }
-                                obj.args["left-border-color"] = left_border_color;
-                            } else if (pname == "right-border-width") {
-                                if (pval.is_double()) {
-                                    obj.args["right-border-width"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["right-border-width"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'right-border-width' is not numeric");
-                                }
-                            } else if (pname == "right-border-style") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'right-border-style' for node " + name + " is not string");
-                                }
-                                obj.args["right-border-style"] = string(pval.as_string().c_str());
-                            } else if (pname == "right-border-color") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'right-border-color' for node " + name + " is not string");
-                                }
-                                string right_border_color(pval.as_string().c_str());
-                                if (right_border_color.size() != 6) {
-                                    Out::errorMessage("Argument 'right-border-color' for node " + name +
-                                                      " is not 6 character string");
-                                }
-                                for (auto c : right_border_color) {
-                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
-                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
-                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
-                                        Out::errorMessage("Argument 'right-border-color' for node " + name + " can not contain '" +
-                                                          c + "' character");
-                                        }
-                                }
-                                obj.args["right-border-color"] = right_border_color;
-                            } else if (pname == "top-border-width") {
-                                if (pval.is_double()) {
-                                    obj.args["top-border-width"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["top-border-width"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'top-border-width' is not numeric");
-                                }
-                            } else if (pname == "top-border-style") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'top-border-style' for node " + name + " is not string");
-                                }
-                                obj.args["top-border-style"] = string(pval.as_string().c_str());
-                            } else if (pname == "top-border-color") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'top-border-color' for node " + name + " is not string");
-                                }
-                                string top_border_color(pval.as_string().c_str());
-                                if (top_border_color.size() != 6) {
-                                    Out::errorMessage("Argument 'top-border-color' for node " + name +
-                                                      " is not 6 character string");
-                                }
-                                for (auto c : top_border_color) {
-                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
-                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
-                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
-                                        Out::errorMessage("Argument 'top-border-color' for node " + name + " can not contain '" +
-                                                          c + "' character");
-                                        }
-                                }
-                                obj.args["top-border-color"] = top_border_color;
-                            } else if (pname == "bottom-border-width") {
-                                if (pval.is_double()) {
-                                    obj.args["bottom-border-width"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["bottom-border-width"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'bottom-border-width' is not numeric");
-                                }
-                            } else if (pname == "bottom-border-style") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'bottom-border-style' for node " + name + " is not string");
-                                }
-                                obj.args["bottom-border-style"] = string(pval.as_string().c_str());
-                            } else if (pname == "bottom-border-color") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'bottom-border-color' for node " + name + " is not string");
-                                }
-                                string bottom_border_color(pval.as_string().c_str());
-                                if (bottom_border_color.size() != 6) {
-                                    Out::errorMessage("Argument 'bottom-border-color' for node " + name +
-                                                      " is not 6 character string");
-                                }
-                                for (auto c : bottom_border_color) {
-                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
-                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
-                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
-                                        Out::errorMessage("Argument 'bottom-border-color' for node " + name + " can not contain '" +
-                                                          c + "' character");
-                                        }
-                                }
-                                obj.args["bottom-border-color"] = bottom_border_color;
-                            } else if (pname == "border-width") {
-                                if (pval.is_double()) {
-                                    string border_width = std::to_string(pval.as_double());
-                                    obj.args["left-border-width"] = !obj.args.contains("left-border-width") ? border_width : obj.args["left-border-width"];
-                                    obj.args["right-border-width"] = !obj.args.contains("right-border-width") ? border_width : obj.args["right-border-width"];
-                                    obj.args["top-border-width"] = !obj.args.contains("top-border-width") ? border_width : obj.args["top-border-width"];
-                                    obj.args["bottom-border-width"] = !obj.args.contains("bottom-border-width") ? border_width : obj.args["bottom-border-width"];
-                                } else if (pval.is_int64()) {
-                                    string border_width = std::to_string(pval.as_int64());
-                                    obj.args["left-border-width"] = !obj.args.contains("left-border-width") ? border_width : obj.args["left-border-width"];
-                                    obj.args["right-border-width"] = !obj.args.contains("right-border-width") ? border_width : obj.args["right-border-width"];
-                                    obj.args["top-border-width"] = !obj.args.contains("top-border-width") ? border_width : obj.args["top-border-width"];
-                                    obj.args["bottom-border-width"] = !obj.args.contains("bottom-border-width") ? border_width : obj.args["bottom-border-width"];
-                                } else {
-                                    Out::errorMessage("Argument 'border-width' is not numeric");
-                                }
-                            } else if (pname == "border-style") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'border-style' for node " + name + " is not string");
-                                }
-                                string border_style = string(pval.as_string().c_str());
-                                obj.args["left-border-style"] = !obj.args.contains("left-border-style") ? border_style : obj.args["left-border-style"];
-                                obj.args["right-border-style"] = !obj.args.contains("right-border-style") ? border_style : obj.args["right-border-style"];
-                                obj.args["top-border-style"] = !obj.args.contains("top-border-style") ? border_style : obj.args["top-border-style"];
-                                obj.args["bottom-border-style"] = !obj.args.contains("bottom-border-style") ? border_style : obj.args["bottom-border-style"];
-                            } else if (pname == "border-color") {
-                                if (!pval.is_string()) {
-                                    Out::errorMessage("Argument 'border-color' for node " + name + " is not string");
-                                }
-                                string border_color(pval.as_string().c_str());
-                                if (border_color.size() != 6) {
-                                    Out::errorMessage("Argument 'border-color' for node " + name +
-                                                      " is not 6 character string");
-                                }
-                                for (auto c : border_color) {
-                                    if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' &&
-                                        c != '6' && c != '7' && c != '8' && c != '9' && c != 'A' && c != 'B' &&
-                                        c != 'C' && c != 'D' && c != 'E' && c != 'F') {
-                                        Out::errorMessage("Argument 'border-color' for node " + name + " can not contain '" +
-                                                          c + "' character");
-                                        }
-                                }
-                                obj.args["left-border-color"] = !obj.args.contains("left-border-color") ? border_color : obj.args["left-border-color"];
-                                obj.args["right-border-color"] = !obj.args.contains("right-border-color") ? border_color : obj.args["right-border-color"];
-                                obj.args["top-border-color"] = !obj.args.contains("top-border-color") ? border_color : obj.args["top-border-color"];
-                                obj.args["bottom-border-color"] = !obj.args.contains("bottom-border-color") ? border_color : obj.args["bottom-border-color"];
-                            } else if (pname == "margin-left") {
-                                if (pval.is_double()) {
-                                    obj.args["margin-left"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["margin-left"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'margin-left' is not numeric");
-                                }
-                            } else if (pname == "margin-right") {
-                                if (pval.is_double()) {
-                                    obj.args["margin-right"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["margin-right"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'margin-right' is not numeric");
-                                }
-                            } else if (pname == "margin-top") {
-                                if (pval.is_double()) {
-                                    obj.args["margin-top"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["margin-top"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'margin-top' is not numeric");
-                                }
-                            } else if (pname == "margin-bottom") {
-                                if (pval.is_double()) {
-                                    obj.args["margin-bottom"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["margin-bottom"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'margin-bottom' is not numeric");
-                                }
-                            } else if (pname == "padding-left") {
-                                if (pval.is_double()) {
-                                    obj.args["padding-left"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["padding-left"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'padding-left' is not numeric");
-                                }
-                            } else if (pname == "padding-right") {
-                                if (pval.is_double()) {
-                                    obj.args["padding-right"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["padding-right"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'padding-right' is not numeric");
-                                }
-                            } else if (pname == "padding-top") {
-                                if (pval.is_double()) {
-                                    obj.args["padding-top"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["padding-top"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'padding-top' is not numeric");
-                                }
-                            } else if (pname == "padding-bottom") {
-                                if (pval.is_double()) {
-                                    obj.args["padding-bottom"] = std::to_string(pval.as_double());
-                                } else if (pval.is_int64()) {
-                                    obj.args["padding-bottom"] = std::to_string(pval.as_int64());
-                                } else {
-                                    Out::errorMessage("Argument 'padding-bottom' is not numeric");
-                                }
-                            } else if (pname == "margin-horizontal") {
-                                if (pval.is_double()) {
-                                    obj.args["margin-left"] = !obj.args.contains("margin-left") ? std::to_string(pval.as_double()) : obj.args["margin-left"];
-                                    obj.args["margin-right"] = !obj.args.contains("margin-right") ? std::to_string(pval.as_double()) : obj.args["margin-right"];
-                                } else if (pval.is_int64()) {
-                                    obj.args["margin-left"] = !obj.args.contains("margin-left") ? std::to_string(pval.as_int64()) : obj.args["margin-left"];
-                                    obj.args["margin-right"] = !obj.args.contains("margin-right") ? std::to_string(pval.as_int64()) : obj.args["margin-right"];
-                                } else {
-                                    Out::errorMessage("Argument 'margin-horizontal' is not numeric");
-                                }
-                            } else if (pname == "margin-vertical") {
-                                if (pval.is_double()) {
-                                    obj.args["margin-top"] = !obj.args.contains("margin-top") ? std::to_string(pval.as_double()) : obj.args["margin-top"];
-                                    obj.args["margin-bottom"] = !obj.args.contains("margin-bottom") ? std::to_string(pval.as_double()) : obj.args["margin-bottom"];
-                                } else if (pval.is_int64()) {
-                                    obj.args["margin-top"] = !obj.args.contains("margin-top") ? std::to_string(pval.as_int64()) : obj.args["margin-top"];
-                                    obj.args["margin-bottom"] = !obj.args.contains("margin-bottom") ? std::to_string(pval.as_int64()) : obj.args["margin-bottom"];
-                                } else {
-                                    Out::errorMessage("Argument 'margin-vertical' is not numeric");
-                                }
-                            } else if (pname == "padding-horizontal") {
-                                if (pval.is_double()) {
-                                    obj.args["padding-left"] = !obj.args.contains("padding-left") ? std::to_string(pval.as_double()) : obj.args["padding-left"];
-                                    obj.args["padding-right"] = !obj.args.contains("padding-right") ? std::to_string(pval.as_double()) : obj.args["padding-right"];
-                                } else if (pval.is_int64()) {
-                                    obj.args["padding-left"] = !obj.args.contains("padding-left") ? std::to_string(pval.as_int64()) : obj.args["padding-left"];
-                                    obj.args["padding-right"] = !obj.args.contains("padding-right") ? std::to_string(pval.as_int64()) : obj.args["padding-right"];
-                                } else {
-                                    Out::errorMessage("Argument 'padding-horizontal' is not numeric");
-                                }
-                            } else if (pname == "padding-vertical") {
-                                if (pval.is_double()) {
-                                    obj.args["padding-top"] = !obj.args.contains("padding-top") ? std::to_string(pval.as_double()) : obj.args["padding-top"];
-                                    obj.args["padding-bottom"] = !obj.args.contains("padding-bottom") ? std::to_string(pval.as_double()) : obj.args["padding-bottom"];
-                                } else if (pval.is_int64()) {
-                                    obj.args["padding-top"] = !obj.args.contains("padding-top") ? std::to_string(pval.as_int64()) : obj.args["padding-top"];
-                                    obj.args["padding-bottom"] = !obj.args.contains("padding-bottom") ? std::to_string(pval.as_int64()) : obj.args["padding-bottom"];
-                                } else {
-                                    Out::errorMessage("Argument 'margin-vertical' is not numeric");
-                                }
-                            } else if (pname == "margin") {
-                                if (pval.is_double()) {
-                                    obj.args["margin-left"] = !obj.args.contains("margin-left") ? std::to_string(pval.as_double()) : obj.args["margin-left"];
-                                    obj.args["margin-right"] = !obj.args.contains("margin-right") ? std::to_string(pval.as_double()) : obj.args["margin-right"];
-                                    obj.args["margin-top"] = !obj.args.contains("margin-top") ? std::to_string(pval.as_double()) : obj.args["margin-top"];
-                                    obj.args["margin-bottom"] = !obj.args.contains("margin-bottom") ? std::to_string(pval.as_double()) : obj.args["margin-bottom"];
-                                } else if (pval.is_int64()) {
-                                    obj.args["margin-left"] = !obj.args.contains("margin-left") ? std::to_string(pval.as_int64()) : obj.args["margin-left"];
-                                    obj.args["margin-right"] = !obj.args.contains("margin-right") ? std::to_string(pval.as_int64()) : obj.args["margin-right"];
-                                    obj.args["margin-top"] = !obj.args.contains("margin-top") ? std::to_string(pval.as_int64()) : obj.args["margin-top"];
-                                    obj.args["margin-bottom"] = !obj.args.contains("margin-bottom") ? std::to_string(pval.as_int64()) : obj.args["margin-bottom"];
-                                } else {
-                                    Out::errorMessage("Argument 'margin' is not numeric");
-                                }
-                            } else if (pname == "padding") {
-                                if (pval.is_double()) {
-                                    obj.args["padding-left"] = !obj.args.contains("padding-left") ? std::to_string(pval.as_double()) : obj.args["padding-left"];
-                                    obj.args["padding-right"] = !obj.args.contains("padding-right") ? std::to_string(pval.as_double()) : obj.args["padding-right"];
-                                    obj.args["padding-top"] = !obj.args.contains("padding-top") ? std::to_string(pval.as_double()) : obj.args["padding-top"];
-                                    obj.args["padding-bottom"] = !obj.args.contains("padding-bottom") ? std::to_string(pval.as_double()) : obj.args["padding-bottom"];
-                                } else if (pval.is_int64()) {
-                                    obj.args["padding-left"] = !obj.args.contains("padding-left") ? std::to_string(pval.as_int64()) : obj.args["padding-left"];
-                                    obj.args["padding-right"] = !obj.args.contains("padding-right") ? std::to_string(pval.as_int64()) : obj.args["padding-right"];
-                                    obj.args["padding-top"] = !obj.args.contains("padding-top") ? std::to_string(pval.as_int64()) : obj.args["padding-top"];
-                                    obj.args["padding-bottom"] = !obj.args.contains("padding-bottom") ? std::to_string(pval.as_int64()) : obj.args["padding-bottom"];
-                                } else {
-                                    Out::errorMessage("Argument 'padding' is not numeric");
-                                }
-                            } else {
-                                Out::errorMessage("WARNING: argument '" + name + "' is not known and will be ignored");
+                            string pval;
+                            if (param.value().is_string()) {
+                                pval = string(param.value().as_string().c_str());
+                            } else if (param.value().is_double()) {
+                                pval = to_string(param.value().as_double());
+                            } else if (param.value().is_int64()) {
+                                pval = to_string(param.value().as_int64());
                             }
+                            parseOption(name, pname, pval, obj.args);
                         }
                         Parser::objs[name] = obj;
                     }
@@ -412,4 +61,122 @@ for (auto arg : conf) {
             }
         }
     }
+}
+
+void ConfReader::parseOption(string node, string name, string val, map<string, string> &attrs) {
+    if (name == "font" || name == "left-border-style" || name == "right-border-style" || name == "top-border-style" ||
+        name == "bottom-border-style") {
+        attrs["font"] = val;
+    } else if (name == "font-size" || name == "left-border-width" || name == "right-border-width" ||
+               name == "top-border-width" || name == "bottom-border-width" || name == "margin-left" ||
+               name == "margin-right" || name == "margin-top" || name == "margin-bottom" || name == "padding-left" ||
+               name == "padding-right" || name == "padding-top" || name == "padding-bottom") {
+        if (isNum(val)) {
+            attrs[name] = val;
+        } else {
+            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+        }
+    } else if (name == "font-color" || name == "background-color" || name == "left-border-color" ||
+               name == "right-border-color" || name == "top-border-color" || name == "bottom-border-color") {
+        if (isHexColor(val)) {
+            attrs[name] = val;
+        } else {
+            Out::errorMessage("Argument '" + name + "' for node " + node + " is not valid");
+        }
+    } else if (name == "border-width") {
+        if (isNum(val)) {
+            attrs["left-border-width"] = !attrs.contains("left-border-width") ? val : attrs["left-border-width"];
+            attrs["right-border-width"] = !attrs.contains("right-border-width") ? val : attrs["right-border-width"];
+            attrs["top-border-width"] = !attrs.contains("top-border-width") ? val : attrs["top-border-width"];
+            attrs["bottom-border-width"] = !attrs.contains("bottom-border-width") ? val : attrs["bottom-border-width"];
+        } else {
+            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+        }
+    } else if (name == "border-style") {
+        attrs["left-border-style"] = !attrs.contains("left-border-style") ? val : attrs["left-border-style"];
+        attrs["right-border-style"] = !attrs.contains("right-border-style") ? val : attrs["right-border-style"];
+        attrs["top-border-style"] = !attrs.contains("top-border-style") ? val : attrs["top-border-style"];
+        attrs["bottom-border-style"] = !attrs.contains("bottom-border-style") ? val : attrs["bottom-border-style"];
+    } else if (name == "border-color") {
+        if (isHexColor(val)) {
+            attrs["left-border-color"] = !attrs.contains("left-border-color") ? val : attrs["left-border-color"];
+            attrs["right-border-color"] = !attrs.contains("right-border-color") ? val : attrs["right-border-color"];
+            attrs["top-border-color"] = !attrs.contains("top-border-color") ? val : attrs["top-border-color"];
+            attrs["bottom-border-color"] = !attrs.contains("bottom-border-color") ? val : attrs["bottom-border-color"];
+        } else {
+            Out::errorMessage("Argument '" + name + "' for node " + node + " is not valid");
+        }
+    } else if (name == "margin-horizontal") {
+        if (isNum(val)) {
+            attrs["margin-left"] = !attrs.contains("margin-left") ? val : attrs["margin-left"];
+            attrs["margin-right"] = !attrs.contains("margin-right") ? val : attrs["margin-right"];
+        } else {
+            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+        }
+    } else if (name == "margin-vertical") {
+        if (isNum(val)) {
+            attrs["margin-top"] = !attrs.contains("margin-top") ? val : attrs["margin-top"];
+            attrs["margin-bottom"] = !attrs.contains("margin-bottom") ? val : attrs["margin-bottom"];
+        } else {
+            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+        }
+    } else if (name == "padding-horizontal") {
+        if (isNum(val)) {
+            attrs["padding-left"] = !attrs.contains("padding-left") ? val : attrs["padding-left"];
+            attrs["padding-right"] = !attrs.contains("padding-right") ? val : attrs["padding-right"];
+        } else {
+            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+        }
+    } else if (name == "padding-vertical") {
+        if (isNum(val)) {
+            attrs["padding-top"] = !attrs.contains("padding-top") ? val : attrs["padding-top"];
+            attrs["padding-bottom"] = !attrs.contains("padding-bottom") ? val : attrs["padding-bottom"];
+        } else {
+            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+        }
+    } else if (name == "margin") {
+        if (isNum(val)) {
+            attrs["margin-left"] = !attrs.contains("margin-left") ? val : attrs["margin-left"];
+            attrs["margin-right"] = !attrs.contains("margin-right") ? val : attrs["margin-right"];
+            attrs["margin-top"] = !attrs.contains("margin-top") ? val : attrs["margin-top"];
+            attrs["margin-bottom"] = !attrs.contains("margin-bottom") ? val : attrs["margin-bottom"];
+        } else {
+            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+        }
+    } else if (name == "padding") {
+        if (isNum(val)) {
+            attrs["padding-left"] = !attrs.contains("padding-left") ? val : attrs["padding-left"];
+            attrs["padding-right"] = !attrs.contains("padding-right") ? val : attrs["padding-right"];
+            attrs["padding-top"] = !attrs.contains("padding-top") ? val : attrs["padding-top"];
+            attrs["padding-bottom"] = !attrs.contains("padding-bottom") ? val : attrs["padding-bottom"];
+        } else {
+            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+        }
+    } else {
+        Out::errorMessage("WARNING: argument '" + name + "' is not known and will be ignored");
+    }
+}
+
+bool ConfReader::isHexColor(string str) {
+    if (str.size() != 6) {
+        Out::errorMessage("Color " + str + " is not 6 character string");
+        return false;
+    }
+    for (auto c : str) {
+        if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' && c != '6' && c != '7' && c != '8' &&
+            c != '9' && c != 'A' && c != 'B' && c != 'C' && c != 'D' && c != 'E' && c != 'F') {
+            Out::errorMessage("Color " + str + " can not contain '" + c + "' character");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool ConfReader::isNum(string str) {
+    try {
+        std::stod(str);
+    } catch (...) {
+        return false;
+    }
+    return true;
 }

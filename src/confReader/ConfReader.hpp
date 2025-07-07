@@ -21,6 +21,7 @@
  *  Reader of config file.
  */
 #pragma once
+#include <Defs.hpp>
 #include <boost/json.hpp>
 
 class ConfReader {
@@ -28,4 +29,7 @@ class ConfReader {
     boost::json::object conf;
     ConfReader();
     void parse();
+    static void parseOption(string node, string name, string val, map<string, string> &attrs);
+    static bool isHexColor(string str);
+    static bool isNum(string str);
 };
