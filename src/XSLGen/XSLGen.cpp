@@ -176,6 +176,8 @@ void XSLGen::addProps(xmlNode *node, map<string, string> attrs) {
                 xmlNewProp(node, BAD_CAST "border-bottom", BAD_CAST (width+"pt "+style+" #"+color).c_str());
                 bottom = true;
             }
+        } else if (prop.first == "margin-left" || prop.first == "margin-right" || prop.first == "margin-top" || prop.first == "margin-bottom" || prop.first == "padding-left" || prop.first == "padding-right" || prop.first == "padding-top" || prop.first == "padding-bottom") {
+            xmlNewProp(node, BAD_CAST prop.first.c_str(), BAD_CAST (prop.second+"pt").c_str());
         }
     }
 }
