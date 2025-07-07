@@ -66,11 +66,12 @@ void ConfReader::parse() {
 void ConfReader::parseOption(string node, string name, string val, map<string, string> &attrs) {
     if (name == "font" || name == "left-border-style" || name == "right-border-style" || name == "top-border-style" ||
         name == "bottom-border-style") {
-        attrs["font"] = val;
+        attrs[name] = val;
     } else if (name == "font-size" || name == "left-border-width" || name == "right-border-width" ||
                name == "top-border-width" || name == "bottom-border-width" || name == "margin-left" ||
                name == "margin-right" || name == "margin-top" || name == "margin-bottom" || name == "padding-left" ||
-               name == "padding-right" || name == "padding-top" || name == "padding-bottom") {
+               name == "padding-right" || name == "padding-top" || name == "padding-bottom" || name == "width" ||
+               name == "height") {
         if (isNum(val)) {
             attrs[name] = val;
         } else {

@@ -39,4 +39,5 @@ public:
     void addText(size_t parent, string text);
 
     void addProps(xmlNode *node, map<string, string> attrs);
+    void addContainerProps(xmlNode *node, map<string, string> attrs);
 };
