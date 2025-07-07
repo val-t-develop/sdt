@@ -156,6 +156,8 @@ void XSLGen::addProps(xmlNode *node, map<string, string> attrs) {
             xmlNewProp(node, BAD_CAST "font-size", BAD_CAST(prop.second + "pt").c_str());
         } else if (prop.first == "font-color") {
             xmlNewProp(node, BAD_CAST "color", BAD_CAST("#" + prop.second).c_str()); // TODO # to ConfReader
+        } else if (prop.first == "text-align") {
+            xmlNewProp(node, BAD_CAST "text-align", BAD_CAST prop.second.c_str());
         } else if (prop.first == "background-color") {
             xmlNewProp(node, BAD_CAST "background-color", BAD_CAST("#" + prop.second).c_str());
         } else if (prop.first == "left-border-color" || prop.first == "left-border-width" ||

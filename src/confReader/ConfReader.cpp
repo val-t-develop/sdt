@@ -65,7 +65,7 @@ void ConfReader::parse() {
 
 void ConfReader::parseOption(string node, string name, string val, map<string, string> &attrs) {
     if (name == "font" || name == "left-border-style" || name == "right-border-style" || name == "top-border-style" ||
-        name == "bottom-border-style") {
+        name == "bottom-border-style" || name == "text-align") {
         attrs[name] = val;
     } else if (name == "font-size" || name == "left-border-width" || name == "right-border-width" ||
                name == "top-border-width" || name == "bottom-border-width" || name == "margin-left" ||
