@@ -46,14 +46,22 @@ void ConfReader::parse() {
                         for (auto param : params) {
                             string pname(param.key());
                             string pval;
-                            if (param.value().is_string()) {
-                                pval = string(param.value().as_string().c_str());
-                            } else if (param.value().is_double()) {
-                                pval = to_string(param.value().as_double());
-                            } else if (param.value().is_int64()) {
-                                pval = to_string(param.value().as_int64());
+                            if (pname == "base") {
+                                if (pval == "block" || pval == "img" || pval == "vid") {
+                                    obj.base = pval;
+                                } else {
+                                    obj = Parser::objs[pval];
+                                }
+                            } else {
+                                if (param.value().is_string()) {
+                                    pval = string(param.value().as_string().c_str());
+                                } else if (param.value().is_double()) {
+                                    pval = to_string(param.value().as_double());
+                                } else if (param.value().is_int64()) {
+                                    pval = to_string(param.value().as_int64());
+                                }
+                                parseOption(name, pname, pval, obj.args);
                             }
-                            parseOption(name, pname, pval, obj.args);
                         }
                         Parser::objs[name] = obj;
                     }
@@ -65,7 +73,7 @@ void ConfReader::parse() {
 
 void ConfReader::parseOption(string node, string name, string val, map<string, string> &attrs) {
     if (name == "font" || name == "left-border-style" || name == "right-border-style" || name == "top-border-style" ||
-        name == "bottom-border-style" || name == "text-align") {
+        name == "bottom-border-style" || name == "text-align" || name == "src") {
         attrs[name] = val;
     } else if (name == "font-size" || name == "left-border-width" || name == "right-border-width" ||
                name == "top-border-width" || name == "bottom-border-width" || name == "margin-left" ||

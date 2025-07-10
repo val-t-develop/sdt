@@ -37,6 +37,7 @@ public:
 
     size_t addBlock(size_t parent, map<string, string> attrs);
     void addText(size_t parent, string text);
+    void addImage(size_t parent, map<string, string> attrs);
 
     void addProps(xmlNode *node, map<string, string> attrs);
     void addContainerProps(xmlNode *node, map<string, string> attrs);

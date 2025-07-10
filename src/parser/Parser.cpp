@@ -23,10 +23,13 @@
 #include "Parser.hpp"
 
 #include "confReader/ConfReader.hpp"
+#include "utils/Out.hpp"
 
 #include <utils/ArgsParser.hpp>
 
-map<string, Parser::Obj> Parser::objs = map<string, Obj>();
+map<string, Parser::Obj> Parser::objs = map<string, Obj>{
+    {"block", Parser::Obj("block", map<string, string>())},
+    {"img", Parser::Obj("img", map<string, string>())}};
 
 Parser::Parser() {
     xmlInitParser();
@@ -63,13 +66,17 @@ void Parser::genNode(xmlNode *node, size_t parent) {
     size_t id = 0;
     if (base == "block") {
         id = xsl_gen.addBlock(parent, attrs);
-    }
-
-    for (auto el = node->children; el; el = el->next) {
-        if (el->type == XML_ELEMENT_NODE) {
-            genNode(el, id);
-        } else if (el->type == XML_TEXT_NODE) {
-            xsl_gen.addText(id, (char*) el->content);
+        for (auto el = node->children; el; el = el->next) {
+            if (el->type == XML_ELEMENT_NODE) {
+                genNode(el, id);
+            } else if (el->type == XML_TEXT_NODE) {
+                xsl_gen.addText(id, (char*) el->content);
+            }
         }
+    } else if (base == "img") {
+        if (node->children != NULL) {
+            Out::errorMessage("Found image node that contain children nodes!");
+        }
+        xsl_gen.addImage(parent, attrs);
     }
 }

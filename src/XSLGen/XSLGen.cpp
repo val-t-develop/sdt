@@ -147,6 +147,30 @@ void XSLGen::addText(size_t parent, string text) {
     xmlAddChild(xsl_block, xsl_apply_templates);
 }
 
+void XSLGen::addImage(size_t parent, map<string, string> attrs) {
+    size_t id = xml_nodes.size();
+    xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("image" + to_string(id)).c_str());
+    xmlNewProp(xml_node, BAD_CAST "src", BAD_CAST attrs["src"].c_str());
+    if (id == 0) {
+        xmlDocSetRootElement(xml_document, xml_node);
+    } else {
+        xmlAddChild(xml_nodes[parent], xml_node);
+    }
+    xml_nodes.push_back(xml_node);
+
+    xmlNode *xsl_template = xmlNewNode(NULL, BAD_CAST "xsl:template");
+    xmlNewProp(xsl_template, BAD_CAST "match", BAD_CAST("image" + to_string(id)).c_str());
+    xmlAddChild(xmlDocGetRootElement(xsl_document), xsl_template);
+
+    xmlNode *xsl_block = xmlNewNode(NULL, BAD_CAST "fo:block");
+    xmlAddChild(xsl_template, xsl_block);
+    xsl_nodes.push_back(xsl_block);
+
+    xmlNode *xsl_external_graphic = xmlNewNode(NULL, BAD_CAST "fo:external-graphic");
+    xmlNewProp(xsl_external_graphic, BAD_CAST "src", BAD_CAST "url('{@src}')");
+    xmlAddChild(xsl_block, xsl_external_graphic);
+}
+
 void XSLGen::addProps(xmlNode *node, map<string, string> attrs) {
     bool left = false, right = false, top = false, bottom = false;
     for (auto prop : attrs) {
