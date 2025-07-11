@@ -29,7 +29,9 @@
 
 map<string, Parser::Obj> Parser::objs = map<string, Obj>{
     {"block", Parser::Obj("block", map<string, string>())},
-    {"img", Parser::Obj("img", map<string, string>())}};
+    {"img", Parser::Obj("img", map<string, string>())},
+    {"br", Parser::Obj("br", map<string, string>())},
+    {"pbr", Parser::Obj("pbr", map<string, string>())}};
 
 Parser::Parser() {
     xmlInitParser();
@@ -78,5 +80,15 @@ void Parser::genNode(xmlNode *node, size_t parent) {
             Out::errorMessage("Found image node that contain children nodes!");
         }
         xsl_gen.addImage(parent, attrs);
+    } else if (base == "br") {
+        if (node->children != NULL) {
+            Out::errorMessage("Found br node that contain children nodes!");
+        }
+        xsl_gen.addBr(parent, attrs);
+    } else if (base == "pbr") {
+        if (node->children != NULL) {
+            Out::errorMessage("Found pbr node that contain children nodes!");
+        }
+        xsl_gen.addPbr(parent, attrs);
     }
 }
