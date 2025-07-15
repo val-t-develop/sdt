@@ -40,6 +40,9 @@ public:
     void addImage(size_t parent, map<string, string> attrs);
     void addBr(size_t parent, map<string, string> attrs);
     void addPbr(size_t parent, map<string, string> attrs);
+    size_t addTable(size_t parent, map<string, string> attrs);
+    size_t addRow(size_t parent, map<string, string> attrs);
+    size_t addCell(size_t parent, map<string, string> attrs);
 
     void addProps(xmlNode *node, map<string, string> attrs);
     void addContainerProps(xmlNode *node, map<string, string> attrs);

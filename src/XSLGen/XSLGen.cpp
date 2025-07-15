@@ -191,7 +191,79 @@ void XSLGen::addBr(size_t parent, map<string, string> attrs) {
 }
 
 void XSLGen::addPbr(size_t parent, map<string, string> attrs) {
-    xmlNewProp(xsl_nodes[xsl_nodes.size()-1], BAD_CAST "break-after", BAD_CAST "page");
+    xmlNewProp(xsl_nodes[xsl_nodes.size() - 1], BAD_CAST "break-after", BAD_CAST "page");
+}
+
+size_t XSLGen::addTable(size_t parent, map<string, string> attrs) {
+    size_t id = xml_nodes.size();
+    xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("table" + to_string(id)).c_str());
+    if (id == 0) {
+        xmlDocSetRootElement(xml_document, xml_node);
+    } else {
+        xmlAddChild(xml_nodes[parent], xml_node);
+    }
+    xml_nodes.push_back(xml_node);
+
+    xmlNode *xsl_template = xmlNewNode(NULL, BAD_CAST "xsl:template");
+    xmlNewProp(xsl_template, BAD_CAST "match", BAD_CAST("table" + to_string(id)).c_str());
+    xmlAddChild(xmlDocGetRootElement(xsl_document), xsl_template);
+
+    xmlNode *xsl_table = xmlNewNode(NULL, BAD_CAST "fo:table");
+    xmlAddChild(xsl_template, xsl_table);
+
+    xmlNode *xsl_table_body = xmlNewNode(NULL, BAD_CAST "fo:table-body");
+    xmlAddChild(xsl_table, xsl_table_body);
+    xsl_nodes.push_back(xsl_table_body);
+
+    xmlNode *xsl_apply_templates = xmlNewNode(NULL, BAD_CAST "xsl:apply-templates");
+    xmlAddChild(xsl_table_body, xsl_apply_templates);
+    return id;
+}
+
+size_t XSLGen::addRow(size_t parent, map<string, string> attrs) {
+    size_t id = xml_nodes.size();
+    xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("row" + to_string(id)).c_str());
+    if (id == 0) {
+        xmlDocSetRootElement(xml_document, xml_node);
+    } else {
+        xmlAddChild(xml_nodes[parent], xml_node);
+    }
+    xml_nodes.push_back(xml_node);
+
+    xmlNode *xsl_template = xmlNewNode(NULL, BAD_CAST "xsl:template");
+    xmlNewProp(xsl_template, BAD_CAST "match", BAD_CAST("row" + to_string(id)).c_str());
+    xmlAddChild(xmlDocGetRootElement(xsl_document), xsl_template);
+
+    xmlNode *xsl_table_row = xmlNewNode(NULL, BAD_CAST "fo:table-row");
+    xmlAddChild(xsl_template, xsl_table_row);
+    xsl_nodes.push_back(xsl_table_row);
+
+    xmlNode *xsl_apply_templates = xmlNewNode(NULL, BAD_CAST "xsl:apply-templates");
+    xmlAddChild(xsl_table_row, xsl_apply_templates);
+    return id;
+}
+
+size_t XSLGen::addCell(size_t parent, map<string, string> attrs) {
+    size_t id = xml_nodes.size();
+    xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("cell" + to_string(id)).c_str());
+    if (id == 0) {
+        xmlDocSetRootElement(xml_document, xml_node);
+    } else {
+        xmlAddChild(xml_nodes[parent], xml_node);
+    }
+    xml_nodes.push_back(xml_node);
+
+    xmlNode *xsl_template = xmlNewNode(NULL, BAD_CAST "xsl:template");
+    xmlNewProp(xsl_template, BAD_CAST "match", BAD_CAST("cell" + to_string(id)).c_str());
+    xmlAddChild(xmlDocGetRootElement(xsl_document), xsl_template);
+
+    xmlNode *xsl_table_cell = xmlNewNode(NULL, BAD_CAST "fo:table-cell");
+    xmlAddChild(xsl_template, xsl_table_cell);
+    xsl_nodes.push_back(xsl_table_cell);
+
+    xmlNode *xsl_apply_templates = xmlNewNode(NULL, BAD_CAST "xsl:apply-templates");
+    xmlAddChild(xsl_table_cell, xsl_apply_templates);
+    return id;
 }
 
 void XSLGen::addProps(xmlNode *node, map<string, string> attrs) {

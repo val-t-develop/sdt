@@ -31,7 +31,10 @@ map<string, Parser::Obj> Parser::objs = map<string, Obj>{
     {"block", Parser::Obj("block", map<string, string>())},
     {"img", Parser::Obj("img", map<string, string>())},
     {"br", Parser::Obj("br", map<string, string>())},
-    {"pbr", Parser::Obj("pbr", map<string, string>())}};
+    {"pbr", Parser::Obj("pbr", map<string, string>())},
+    {"table", Parser::Obj("table", map<string, string>())},
+    {"row", Parser::Obj("row", map<string, string>())},
+    {"cell", Parser::Obj("cell", map<string, string>())}};
 
 Parser::Parser() {
     xmlInitParser();
@@ -90,5 +93,32 @@ void Parser::genNode(xmlNode *node, size_t parent) {
             Out::errorMessage("Found pbr node that contain children nodes!");
         }
         xsl_gen.addPbr(parent, attrs);
+    } else if (base == "table") {
+        id = xsl_gen.addTable(parent, attrs);
+        for (auto el = node->children; el; el = el->next) {
+            if (el->type == XML_ELEMENT_NODE) {
+                genNode(el, id);
+            } else if (el->type == XML_TEXT_NODE) {
+                xsl_gen.addText(id, (char*) el->content);
+            }
+        }
+    } else if (base == "row") {
+        id = xsl_gen.addRow(parent, attrs);
+        for (auto el = node->children; el; el = el->next) {
+            if (el->type == XML_ELEMENT_NODE) {
+                genNode(el, id);
+            } else if (el->type == XML_TEXT_NODE) {
+                xsl_gen.addText(id, (char*) el->content);
+            }
+        }
+    } else if (base == "cell") {
+        id = xsl_gen.addCell(parent, attrs);
+        for (auto el = node->children; el; el = el->next) {
+            if (el->type == XML_ELEMENT_NODE) {
+                genNode(el, id);
+            } else if (el->type == XML_TEXT_NODE) {
+                xsl_gen.addText(id, (char*) el->content);
+            }
+        }
     }
 }
