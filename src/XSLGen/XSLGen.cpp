@@ -23,6 +23,7 @@
 #include "XSLGen.hpp"
 
 #include "utils/ArgsParser.hpp"
+#include "utils/Out.hpp"
 
 XSLGen::XSLGen() {
     xml_document = xmlNewDoc(BAD_CAST "1.0");
@@ -126,7 +127,7 @@ void XSLGen::addText(size_t parent, string text) {
     size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("text" + to_string(id)).c_str());
     if (id == 0) {
-        xmlDocSetRootElement(xml_document, xml_node);
+        Out::errorMessage("Text node can not be root!");
     } else {
         xmlAddChild(xml_nodes[parent], xml_node);
     }
@@ -152,7 +153,7 @@ void XSLGen::addImage(size_t parent, map<string, string> attrs) {
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("image" + to_string(id)).c_str());
     xmlNewProp(xml_node, BAD_CAST "src", BAD_CAST attrs["src"].c_str());
     if (id == 0) {
-        xmlDocSetRootElement(xml_document, xml_node);
+        Out::errorMessage("Image node can not be root!");
     } else {
         xmlAddChild(xml_nodes[parent], xml_node);
     }
@@ -175,7 +176,7 @@ void XSLGen::addBr(size_t parent, map<string, string> attrs) {
     size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("br" + to_string(id)).c_str());
     if (id == 0) {
-        xmlDocSetRootElement(xml_document, xml_node);
+        Out::errorMessage("Br node can not be root!");
     } else {
         xmlAddChild(xml_nodes[parent], xml_node);
     }
@@ -198,7 +199,7 @@ size_t XSLGen::addTable(size_t parent, map<string, string> attrs) {
     size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("table" + to_string(id)).c_str());
     if (id == 0) {
-        xmlDocSetRootElement(xml_document, xml_node);
+        Out::errorMessage("Table node can not be root!");
     } else {
         xmlAddChild(xml_nodes[parent], xml_node);
     }
@@ -212,6 +213,7 @@ size_t XSLGen::addTable(size_t parent, map<string, string> attrs) {
     xmlAddChild(xsl_template, xsl_table);
 
     xmlNode *xsl_table_body = xmlNewNode(NULL, BAD_CAST "fo:table-body");
+    addProps(xsl_table_body, attrs);
     xmlAddChild(xsl_table, xsl_table_body);
     xsl_nodes.push_back(xsl_table_body);
 
@@ -224,7 +226,7 @@ size_t XSLGen::addRow(size_t parent, map<string, string> attrs) {
     size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("row" + to_string(id)).c_str());
     if (id == 0) {
-        xmlDocSetRootElement(xml_document, xml_node);
+        Out::errorMessage("Row node can not be root!");
     } else {
         xmlAddChild(xml_nodes[parent], xml_node);
     }
@@ -235,6 +237,7 @@ size_t XSLGen::addRow(size_t parent, map<string, string> attrs) {
     xmlAddChild(xmlDocGetRootElement(xsl_document), xsl_template);
 
     xmlNode *xsl_table_row = xmlNewNode(NULL, BAD_CAST "fo:table-row");
+    addProps(xsl_table_row, attrs);
     xmlAddChild(xsl_template, xsl_table_row);
     xsl_nodes.push_back(xsl_table_row);
 
@@ -247,7 +250,7 @@ size_t XSLGen::addCell(size_t parent, map<string, string> attrs) {
     size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("cell" + to_string(id)).c_str());
     if (id == 0) {
-        xmlDocSetRootElement(xml_document, xml_node);
+        Out::errorMessage("Cell node can not be root!");
     } else {
         xmlAddChild(xml_nodes[parent], xml_node);
     }
@@ -258,6 +261,7 @@ size_t XSLGen::addCell(size_t parent, map<string, string> attrs) {
     xmlAddChild(xmlDocGetRootElement(xsl_document), xsl_template);
 
     xmlNode *xsl_table_cell = xmlNewNode(NULL, BAD_CAST "fo:table-cell");
+    addProps(xsl_table_cell, attrs);
     xmlAddChild(xsl_template, xsl_table_cell);
     xsl_nodes.push_back(xsl_table_cell);
 
