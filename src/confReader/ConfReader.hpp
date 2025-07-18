@@ -30,6 +30,6 @@ class ConfReader {
     ConfReader();
     void parse();
     static void parseOption(string node, string name, string val, map<string, string> &attrs);
-    static bool isHexColor(string str);
-    static bool isNum(string str);
+    static bool isHexColor(string& str);
+    static bool isWidth(const string& str);
 };

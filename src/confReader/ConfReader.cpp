@@ -23,6 +23,7 @@
 #include "ConfReader.hpp"
 
 #include <parser/Parser.hpp>
+#include <regex>
 #include <utils/ArgsParser.hpp>
 #include <utils/Out.hpp>
 
@@ -47,7 +48,7 @@ void ConfReader::parse() {
                             string pname(param.key());
                             string pval;
                             if (pname == "base") {
-                                if (pval == "block" || pval == "img" || pval == "vid") {
+                                if (pval == "block" || pval == "img") {
                                     obj.base = pval;
                                 } else {
                                     obj = Parser::objs[pval];
@@ -56,9 +57,9 @@ void ConfReader::parse() {
                                 if (param.value().is_string()) {
                                     pval = string(param.value().as_string().c_str());
                                 } else if (param.value().is_double()) {
-                                    pval = to_string(param.value().as_double());
+                                    pval = to_string(param.value().as_double())+"pt";
                                 } else if (param.value().is_int64()) {
-                                    pval = to_string(param.value().as_int64());
+                                    pval = to_string(param.value().as_int64())+"pt";
                                 }
                                 parseOption(name, pname, pval, obj.args);
                             }
@@ -80,10 +81,10 @@ void ConfReader::parseOption(string node, string name, string val, map<string, s
                name == "margin-right" || name == "margin-top" || name == "margin-bottom" || name == "padding-left" ||
                name == "padding-right" || name == "padding-top" || name == "padding-bottom" || name == "width" ||
                name == "height") {
-        if (isNum(val)) {
+        if (isWidth(val)) {
             attrs[name] = val;
         } else {
-            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+            Out::errorMessage("Argument '" + name + "' for node " + node + " has not correct value");
         }
     } else if (name == "font-color" || name == "background-color" || name == "left-border-color" ||
                name == "right-border-color" || name == "top-border-color" || name == "bottom-border-color") {
@@ -93,13 +94,13 @@ void ConfReader::parseOption(string node, string name, string val, map<string, s
             Out::errorMessage("Argument '" + name + "' for node " + node + " is not valid");
         }
     } else if (name == "border-width") {
-        if (isNum(val)) {
+        if (isWidth(val)) {
             attrs["left-border-width"] = !attrs.contains("left-border-width") ? val : attrs["left-border-width"];
             attrs["right-border-width"] = !attrs.contains("right-border-width") ? val : attrs["right-border-width"];
             attrs["top-border-width"] = !attrs.contains("top-border-width") ? val : attrs["top-border-width"];
             attrs["bottom-border-width"] = !attrs.contains("bottom-border-width") ? val : attrs["bottom-border-width"];
         } else {
-            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+            Out::errorMessage("Argument '" + name + "' for node " + node + " has not correct value");
         }
     } else if (name == "border-style") {
         attrs["left-border-style"] = !attrs.contains("left-border-style") ? val : attrs["left-border-style"];
@@ -116,57 +117,62 @@ void ConfReader::parseOption(string node, string name, string val, map<string, s
             Out::errorMessage("Argument '" + name + "' for node " + node + " is not valid");
         }
     } else if (name == "margin-horizontal") {
-        if (isNum(val)) {
+        if (isWidth(val)) {
             attrs["margin-left"] = !attrs.contains("margin-left") ? val : attrs["margin-left"];
             attrs["margin-right"] = !attrs.contains("margin-right") ? val : attrs["margin-right"];
         } else {
-            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+            Out::errorMessage("Argument '" + name + "' for node " + node + " has not correct value");
         }
     } else if (name == "margin-vertical") {
-        if (isNum(val)) {
+        if (isWidth(val)) {
             attrs["margin-top"] = !attrs.contains("margin-top") ? val : attrs["margin-top"];
             attrs["margin-bottom"] = !attrs.contains("margin-bottom") ? val : attrs["margin-bottom"];
         } else {
-            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+            Out::errorMessage("Argument '" + name + "' for node " + node + " has not correct value");
         }
     } else if (name == "padding-horizontal") {
-        if (isNum(val)) {
+        if (isWidth(val)) {
             attrs["padding-left"] = !attrs.contains("padding-left") ? val : attrs["padding-left"];
             attrs["padding-right"] = !attrs.contains("padding-right") ? val : attrs["padding-right"];
         } else {
-            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+            Out::errorMessage("Argument '" + name + "' for node " + node + " has not correct value");
         }
     } else if (name == "padding-vertical") {
-        if (isNum(val)) {
+        if (isWidth(val)) {
             attrs["padding-top"] = !attrs.contains("padding-top") ? val : attrs["padding-top"];
             attrs["padding-bottom"] = !attrs.contains("padding-bottom") ? val : attrs["padding-bottom"];
         } else {
-            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+            Out::errorMessage("Argument '" + name + "' for node " + node + " has not correct value");
         }
     } else if (name == "margin") {
-        if (isNum(val)) {
+        if (isWidth(val)) {
             attrs["margin-left"] = !attrs.contains("margin-left") ? val : attrs["margin-left"];
             attrs["margin-right"] = !attrs.contains("margin-right") ? val : attrs["margin-right"];
             attrs["margin-top"] = !attrs.contains("margin-top") ? val : attrs["margin-top"];
             attrs["margin-bottom"] = !attrs.contains("margin-bottom") ? val : attrs["margin-bottom"];
         } else {
-            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+            Out::errorMessage("Argument '" + name + "' for node " + node + " has not correct value");
         }
     } else if (name == "padding") {
-        if (isNum(val)) {
+        if (isWidth(val)) {
             attrs["padding-left"] = !attrs.contains("padding-left") ? val : attrs["padding-left"];
             attrs["padding-right"] = !attrs.contains("padding-right") ? val : attrs["padding-right"];
             attrs["padding-top"] = !attrs.contains("padding-top") ? val : attrs["padding-top"];
             attrs["padding-bottom"] = !attrs.contains("padding-bottom") ? val : attrs["padding-bottom"];
         } else {
-            Out::errorMessage("Argument '" + name + "' for node " + node + " is not numeric");
+            Out::errorMessage("Argument '" + name + "' for node " + node + " has not correct value");
         }
     } else {
         Out::errorMessage("WARNING: argument '" + name + "' is not known and will be ignored");
     }
 }
 
-bool ConfReader::isHexColor(string str) {
+bool ConfReader::isHexColor(string& str) {
+    if (!str.empty()) {
+        if (str[0] == '#') {
+            str.erase(0, 1);
+        }
+    }
     if (str.size() != 6) {
         Out::errorMessage("Color " + str + " is not 6 character string");
         return false;
@@ -181,11 +187,10 @@ bool ConfReader::isHexColor(string str) {
     return true;
 }
 
-bool ConfReader::isNum(string str) {
-    try {
-        std::stod(str);
-    } catch (...) {
-        return false;
-    }
-    return true;
+bool ConfReader::isWidth(const string& str) {
+    static const std::regex length_regex(
+        R"(^\s*[+-]?(?:\d+(?:\.\d*)?|\.\d+)\s*(pt|cm|mm|in|pc|px|em|ex|%)\s*$)",
+        std::regex_constants::icase
+    );
+    return std::regex_match(str, length_regex);
 }
