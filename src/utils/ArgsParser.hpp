@@ -33,5 +33,5 @@ class ArgsParser {
     static bool debug;
 
     static void parseArgs(int argc, char **argv);
-    static void parseArgs(vector<string> args);
+    static void parseArgs(const vector<string> &args);
 };

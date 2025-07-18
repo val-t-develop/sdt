@@ -25,7 +25,7 @@
 
 int Out::messages = 0;
 
-void Out::errorMessage(string msg) {
+void Out::errorMessage(const string& msg) {
     if (messages <= 50) {
         cerr << msg << "\n";
         messages++;
@@ -35,4 +35,4 @@ void Out::errorMessage(string msg) {
     }
 }
 
-void Out::printMessage(string msg) { cout << msg << "\n"; }
+void Out::printMessage(const string& msg) { cout << msg << "\n"; }

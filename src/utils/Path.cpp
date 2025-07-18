@@ -27,22 +27,22 @@ Path::Path() {
     content = "";
 }
 
-Path::Path(string name) {
+Path::Path(const string& name) {
     path = fs::absolute(fs::path(name));
     content = "";
 }
 
-Path::Path(fs::path &path) {
+Path::Path(const fs::path &path) {
     this->path = path;
     content = "";
 }
 
 string Path::getName() const { return fs::absolute(path).string(); }
 
-string Path::getFilename() { return path.filename(); }
+string Path::getFilename() const { return path.filename(); }
 
 string Path::readFile() {
-    if (content == "") {
+    if (content.empty()) {
         if (!fs::is_regular_file(path)) {
             return "";
         }
@@ -62,14 +62,14 @@ string Path::readFile() {
     }
 }
 
-bool Path::isFile() { return fs::is_regular_file(path); }
+bool Path::isFile() const { return fs::is_regular_file(path); }
 
-bool Path::isDir() { return fs::is_directory(path); }
+bool Path::isDir() const { return fs::is_directory(path); }
 
-vector<Path> Path::getDirContent() {
+vector<Path> Path::getDirContent() const {
     vector<Path> vec{};
-    for (auto entry : fs::directory_iterator(path)) {
-        vec.push_back(Path(entry.path()));
+    for (const auto& entry : fs::directory_iterator(path)) {
+        vec.emplace_back(entry.path());
     }
     return vec;
 }

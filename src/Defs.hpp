@@ -58,5 +58,5 @@ using std::min;
 using std::ofstream;
 using std::stack;
 
-vector<string> split(string s, string delimiter);
+vector<string> split(const string& s, const string& delimiter);
 int64_t power(int base, int exponent);

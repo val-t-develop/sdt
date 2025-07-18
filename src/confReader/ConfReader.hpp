@@ -29,7 +29,7 @@ class ConfReader {
     boost::json::object conf;
     ConfReader();
     void parse();
-    static void parseOption(string node, string name, string val, map<string, string> &attrs);
+    static void parseOption(const string& node, const string& name, string val, map<string, string> &attrs);
     static bool isHexColor(string& str);
     static bool isWidth(const string& str);
 };

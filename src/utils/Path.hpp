@@ -30,15 +30,15 @@ class Path {
 
   public:
     Path();
-    Path(string name);
-    Path(fs::path &path);
+    explicit Path(const string& name);
+    explicit Path(const fs::path &path);
 
-    string getName() const;
-    string getFilename();
+    [[nodiscard]] string getName() const;
+    [[nodiscard]] string getFilename() const;
     string readFile();
-    bool isFile();
-    bool isDir();
-    vector<Path> getDirContent();
+    [[nodiscard]] bool isFile() const;
+    [[nodiscard]] bool isDir() const;
+    [[nodiscard]] vector<Path> getDirContent() const;
     Path getParent();
     static Path getCurrentDir();
     bool operator<(const Path &) const;

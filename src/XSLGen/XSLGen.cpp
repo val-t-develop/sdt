@@ -54,8 +54,8 @@ XSLGen::~XSLGen() {
     xmlCleanupParser();
 }
 
-size_t XSLGen::addBlock(size_t parent, map<string, string> attrs) {
-    size_t id = xml_nodes.size();
+size_t XSLGen::addBlock(const size_t parent, const map<string, string>& attrs) {
+    const size_t id = xml_nodes.size();
 
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("block" + to_string(id)).c_str());
     if (id == 0) {
@@ -123,8 +123,8 @@ size_t XSLGen::addBlock(size_t parent, map<string, string> attrs) {
     return id;
 }
 
-void XSLGen::addText(size_t parent, string text) {
-    size_t id = xml_nodes.size();
+void XSLGen::addText(const size_t parent, const string& text) {
+    const size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("text" + to_string(id)).c_str());
     if (id == 0) {
         Out::errorMessage("Text node can not be root!");
@@ -148,8 +148,8 @@ void XSLGen::addText(size_t parent, string text) {
     xmlAddChild(xsl_block, xsl_apply_templates);
 }
 
-void XSLGen::addImage(size_t parent, map<string, string> attrs) {
-    size_t id = xml_nodes.size();
+void XSLGen::addImage(const size_t parent, map<string, string> attrs) {
+    const size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("image" + to_string(id)).c_str());
     xmlNewProp(xml_node, BAD_CAST "src", BAD_CAST attrs["src"].c_str());
     if (id == 0) {
@@ -172,8 +172,8 @@ void XSLGen::addImage(size_t parent, map<string, string> attrs) {
     xmlAddChild(xsl_block, xsl_external_graphic);
 }
 
-void XSLGen::addBr(size_t parent, map<string, string> attrs) {
-    size_t id = xml_nodes.size();
+void XSLGen::addBr(const size_t parent, const map<string, string>& attrs) {
+    const size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("br" + to_string(id)).c_str());
     if (id == 0) {
         Out::errorMessage("Br node can not be root!");
@@ -191,12 +191,12 @@ void XSLGen::addBr(size_t parent, map<string, string> attrs) {
     xsl_nodes.push_back(xsl_block);
 }
 
-void XSLGen::addPbr(size_t parent, map<string, string> attrs) {
+void XSLGen::addPbr(size_t parent, const map<string, string>& attrs) const {
     xmlNewProp(xsl_nodes[xsl_nodes.size() - 1], BAD_CAST "break-after", BAD_CAST "page");
 }
 
-size_t XSLGen::addTable(size_t parent, map<string, string> attrs) {
-    size_t id = xml_nodes.size();
+size_t XSLGen::addTable(const size_t parent, const map<string, string> &attrs) {
+    const size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("table" + to_string(id)).c_str());
     if (id == 0) {
         Out::errorMessage("Table node can not be root!");
@@ -222,8 +222,8 @@ size_t XSLGen::addTable(size_t parent, map<string, string> attrs) {
     return id;
 }
 
-size_t XSLGen::addRow(size_t parent, map<string, string> attrs) {
-    size_t id = xml_nodes.size();
+size_t XSLGen::addRow(const size_t parent, const map<string, string> &attrs) {
+    const size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("row" + to_string(id)).c_str());
     if (id == 0) {
         Out::errorMessage("Row node can not be root!");
@@ -246,8 +246,8 @@ size_t XSLGen::addRow(size_t parent, map<string, string> attrs) {
     return id;
 }
 
-size_t XSLGen::addCell(size_t parent, map<string, string> attrs) {
-    size_t id = xml_nodes.size();
+size_t XSLGen::addCell(const size_t parent, const map<string, string> &attrs) {
+    const size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("cell" + to_string(id)).c_str());
     if (id == 0) {
         Out::errorMessage("Cell node can not be root!");
@@ -272,7 +272,7 @@ size_t XSLGen::addCell(size_t parent, map<string, string> attrs) {
 
 void XSLGen::addProps(xmlNode *node, map<string, string> attrs) {
     bool left = false, right = false, top = false, bottom = false;
-    for (auto prop : attrs) {
+    for (const auto& prop : attrs) {
         if (prop.first == "font") {
             xmlNewProp(node, BAD_CAST "font-family", BAD_CAST prop.second.c_str());
         } else if (prop.first == "font-size") {
@@ -328,16 +328,16 @@ void XSLGen::addProps(xmlNode *node, map<string, string> attrs) {
 }
 
 void XSLGen::addContainerProps(xmlNode *node, map<string, string> attrs) {
-    for (auto prop : attrs) {
+    for (const auto& prop : attrs) {
         if (prop.first == "width") {
-            double width = std::stod(prop.second);
-            double margin_left = !attrs.contains("margin-left") ? 0 : std::stod(attrs["margin-left"]);
-            double margin_right = !attrs.contains("margin-right") ? 0 : std::stod(attrs["margin-right"]);
+            const double width = std::stod(prop.second);
+            const double margin_left = !attrs.contains("margin-left") ? 0 : std::stod(attrs["margin-left"]);
+            const double margin_right = !attrs.contains("margin-right") ? 0 : std::stod(attrs["margin-right"]);
             xmlNewProp(node, BAD_CAST prop.first.c_str(), BAD_CAST to_string(width+margin_left+margin_right).c_str());
         } else if (prop.first == "height") {
-            double height = std::stod(prop.second);
-            double margin_top = !attrs.contains("margin-top") ? 0 : std::stod(attrs["margin-top"]);
-            double margin_bottom = !attrs.contains("margin-bottom") ? 0 : std::stod(attrs["margin-bottom"]);
+            const double height = std::stod(prop.second);
+            const double margin_top = !attrs.contains("margin-top") ? 0 : std::stod(attrs["margin-top"]);
+            const double margin_bottom = !attrs.contains("margin-bottom") ? 0 : std::stod(attrs["margin-bottom"]);
             xmlNewProp(node, BAD_CAST prop.first.c_str(), BAD_CAST to_string(height+margin_top+margin_bottom).c_str());
         }
     }

@@ -28,6 +28,6 @@ class Out {
   public:
     static int messages;
 
-    static void errorMessage(string msg);
-    static void printMessage(string msg);
+    static void errorMessage(const string& msg);
+    static void printMessage(const string& msg);
 };

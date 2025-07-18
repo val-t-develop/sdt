@@ -27,12 +27,12 @@
 #include <confReader/ConfReader.hpp>
 #include <parser/Parser.hpp>
 
-int main(int argc, char **argv) {
+int main(const int argc, char **argv) {
     Main::main(argc, argv);
     return 0;
 }
 
-void Main::main(int argc, char **argv) {
+void Main::main(const int argc, char **argv) {
     ArgsParser::parseArgs(argc, argv);
     if (ArgsParser::src->isFile()) {
         if (ArgsParser::conf != nullptr) {
@@ -45,10 +45,10 @@ void Main::main(int argc, char **argv) {
         Out::errorMessage("Processing directories is unsupported");
     }
 
-    string command = "fop -xml '"+ArgsParser::src->getName()+".xml' -xsl '"+ArgsParser::src->getName()+".xsl' -pdf '"+ArgsParser::output->getName()+"'";
+    const string command = "fop -xml '"+ArgsParser::src->getName()+".xml' -xsl '"+ArgsParser::src->getName()+".xsl' -pdf '"+ArgsParser::output->getName()+"'";
     system(command.c_str());
     if (!ArgsParser::debug) {
-        string rm_command = "rm '"+ArgsParser::src->getName()+".xml' '"+ArgsParser::src->getName()+".xsl'";
+        const string rm_command = "rm '"+ArgsParser::src->getName()+".xml' '"+ArgsParser::src->getName()+".xsl'";
         system(rm_command.c_str());
     }
 }

@@ -35,15 +35,15 @@ public:
     XSLGen();
     ~XSLGen();
 
-    size_t addBlock(size_t parent, map<string, string> attrs);
-    void addText(size_t parent, string text);
+    size_t addBlock(size_t parent, const map<string, string>& attrs);
+    void addText(size_t parent, const string& text);
     void addImage(size_t parent, map<string, string> attrs);
-    void addBr(size_t parent, map<string, string> attrs);
-    void addPbr(size_t parent, map<string, string> attrs);
-    size_t addTable(size_t parent, map<string, string> attrs);
-    size_t addRow(size_t parent, map<string, string> attrs);
-    size_t addCell(size_t parent, map<string, string> attrs);
+    void addBr(size_t parent, const map<string, string>& attrs);
+    void addPbr(size_t parent, const map<string, string>& attrs) const;
+    size_t addTable(size_t parent, const map<string, string> &attrs);
+    size_t addRow(size_t parent, const map<string, string> &attrs);
+    size_t addCell(size_t parent, const map<string, string> &attrs);
 
-    void addProps(xmlNode *node, map<string, string> attrs);
-    void addContainerProps(xmlNode *node, map<string, string> attrs);
+    static void addProps(xmlNode *node, map<string, string> attrs);
+    static void addContainerProps(xmlNode *node, map<string, string> attrs);
 };

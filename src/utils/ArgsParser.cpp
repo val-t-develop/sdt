@@ -29,7 +29,7 @@ shared_ptr<Path> ArgsParser::conf = nullptr;
 shared_ptr<Path> ArgsParser::src = nullptr;
 bool ArgsParser::debug = false;
 
-void ArgsParser::parseArgs(int argc, char **argv) {
+void ArgsParser::parseArgs(const int argc, char **argv) {
     string home = getenv("HOME");
     if (home.size() != 1 && (home.ends_with('/') || home.ends_with('\\'))) {
         home.pop_back();
@@ -47,7 +47,7 @@ void ArgsParser::parseArgs(int argc, char **argv) {
     parseArgs(vec);
 }
 
-void ArgsParser::parseArgs(vector<string> args) {
+void ArgsParser::parseArgs(const vector<string> &args) {
     for (size_t i = 1; i < args.size(); i++) {
         string arg = args[i];
         if (arg == "-o") {

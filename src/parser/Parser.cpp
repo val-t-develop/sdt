@@ -51,15 +51,15 @@ void Parser::parse() {
     genNode(root, 0);
 }
 
-void Parser::genNode(xmlNode *node, size_t parent) {
+void Parser::genNode(const xmlNode *node, const size_t parent) {
     string base = "block";
-    map<string, string> attrs = map<string, string>();
+    map<string, string> attrs{};
     if (objs.contains(string((char*) node->name))) {
         Obj obj = objs[string((char*) node->name)];
         if (!obj.base.empty()) {
             base = obj.base;
         }
-        for (auto el : obj.args) {
+        for (const auto& el : obj.args) {
             attrs[el.first] = el.second;
         }
     }

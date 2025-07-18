@@ -22,13 +22,13 @@
  */
 #include "Defs.hpp"
 
-vector<string> split(string s, string delimiter) {
-    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-    string token;
+vector<string> split(const string& s, const string& delimiter) {
+    size_t pos_start = 0, pos_end;
+    const size_t delim_len = delimiter.length();
     vector<string> res;
 
     while ((pos_end = s.find(delimiter, pos_start)) != string::npos) {
-        token = s.substr(pos_start, pos_end - pos_start);
+        string token = s.substr(pos_start, pos_end - pos_start);
         pos_start = pos_end + delim_len;
         res.push_back(token);
     }
@@ -36,7 +36,7 @@ vector<string> split(string s, string delimiter) {
     res.push_back(s.substr(pos_start));
     return res;
 }
-int64_t power(int base, int exponent) {
+int64_t power(const int base, const int exponent) {
     int64_t result = 1;
     for (int i = 0; i < exponent; ++i) {
         result *= base;

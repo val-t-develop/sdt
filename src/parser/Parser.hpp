@@ -41,6 +41,6 @@ public:
     Parser();
     ~Parser();
     void parse();
-    void genNode(xmlNode *node, size_t parent);
+    void genNode(const xmlNode *node, size_t parent);
 };
 

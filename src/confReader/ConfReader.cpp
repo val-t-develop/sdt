@@ -72,7 +72,7 @@ void ConfReader::parse() {
     }
 }
 
-void ConfReader::parseOption(string node, string name, string val, map<string, string> &attrs) {
+void ConfReader::parseOption(const string& node, const string& name, string val, map<string, string> &attrs) {
     if (name == "font" || name == "left-border-style" || name == "right-border-style" || name == "top-border-style" ||
         name == "bottom-border-style" || name == "text-align" || name == "src") {
         attrs[name] = val;
@@ -177,7 +177,8 @@ bool ConfReader::isHexColor(string& str) {
         Out::errorMessage("Color " + str + " is not 6 character string");
         return false;
     }
-    for (auto c : str) {
+
+    for (const auto c : str) {
         if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' && c != '6' && c != '7' && c != '8' &&
             c != '9' && c != 'A' && c != 'B' && c != 'C' && c != 'D' && c != 'E' && c != 'F') {
             Out::errorMessage("Color " + str + " can not contain '" + c + "' character");
