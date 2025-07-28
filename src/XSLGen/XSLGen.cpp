@@ -195,7 +195,7 @@ void XSLGen::addPbr(size_t parent, const map<string, string>& attrs) const {
     xmlNewProp(xsl_nodes[xsl_nodes.size() - 1], BAD_CAST "break-after", BAD_CAST "page");
 }
 
-size_t XSLGen::addTable(const size_t parent, const map<string, string> &attrs) {
+size_t XSLGen::addTable(const size_t parent, map<string, string> &attrs) {
     const size_t id = xml_nodes.size();
     xmlNode *xml_node = xmlNewNode(NULL, BAD_CAST("table" + to_string(id)).c_str());
     if (id == 0) {
@@ -210,6 +210,10 @@ size_t XSLGen::addTable(const size_t parent, const map<string, string> &attrs) {
     xmlAddChild(xmlDocGetRootElement(xsl_document), xsl_template);
 
     xmlNode *xsl_table = xmlNewNode(NULL, BAD_CAST "fo:table");
+    xmlNewProp(xsl_table, BAD_CAST "table-layout", BAD_CAST "fixed");
+    if (attrs.contains("width")) {
+        xmlNewProp(xsl_table, BAD_CAST "width", BAD_CAST attrs["width"].c_str());
+    }
     xmlAddChild(xsl_template, xsl_table);
 
     xmlNode *xsl_table_body = xmlNewNode(NULL, BAD_CAST "fo:table-body");

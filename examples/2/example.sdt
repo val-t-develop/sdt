@@ -1,0 +1,12 @@
+<doc>
+    <table border-color="000000" border-width="1px" width="50%">
+        <row border-color="FF0000" border-width="3px">
+            <cell>Hello</cell>
+            <cell>World</cell>
+        </row>
+        <row>
+            <cell border-color="000000" border-width="1px">Hello</cell>
+            <cell border-color="000000" border-width="1px">World</cell>
+        </row>
+    </table>
+</doc>
