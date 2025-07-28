@@ -50,7 +50,18 @@ void ArgsParser::parseArgs(const int argc, char **argv) {
 void ArgsParser::parseArgs(const vector<string> &args) {
     for (size_t i = 1; i < args.size(); i++) {
         string arg = args[i];
-        if (arg == "-o") {
+        if (arg == "--help" || arg == "-h") {
+            Out::printMessage(
+                "Usage: sdt <input.sdt> [-c <config.json>] [-o <output.pdf>] [-g|-d]\n"
+                "  <input.sdt>         Input document in SDT format (required)\n"
+                "  -c <config.json>    JSON configuration file for styles (optional)\n"
+                "  -o <output.pdf>     Output PDF file name (optional)\n"
+                "  -g or -d           Enable debug mode (keeps intermediate files)\n"
+                "  show c|show w      Show license information\n"
+                "  -h, --help         Show this help message and exit\n"
+            );
+            exit(0);
+        } else if (arg == "-o") {
             i++;
             arg = args[i];
             output = make_shared<Path>(arg);
